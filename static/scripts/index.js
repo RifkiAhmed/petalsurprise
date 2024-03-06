@@ -1,47 +1,48 @@
 let carts = [];
 
 function addToCart(id) {
+    $('.list-items').eq(0).css('visibility', 'hidden');
+    $('.add-new-item').eq(0).css('visibility', 'hidden');
     try {
-        const badge = document.getElementById('badge');
-        const count = badge.innerHTML;
+        const $badge = $('#badge');
+        const $count = parseInt($badge.html()) || 0;
         if (carts.includes(id)) {
-            const parsedCount = parseInt(count) || 0;
-            badge.innerHTML = parsedCount - 1;
+            $badge.html($count - 1);
             carts = carts.filter(item => item !== id);
         } else {
             carts.push(id);
-            badge.innerHTML = parseInt(count) + 1;
+            $badge.html($count + 1);
         }
         toggleCartColor(id);
-    }
-    catch (err) {
+    } catch (err) {
         console.error(err.message);
     }
 }
 
 function toggleCartColor(id) {
-    var cartIcon = document.getElementById(id);
-    if (cartIcon.classList.contains('green')) {
-      cartIcon.classList.remove('green');
-      cartIcon.classList.add('Sky-Blue');
+    if ($(`#${id}`).hasClass('green')) {
+        $(`#${id}`).removeClass('green');
+        $(`#${id}`).addClass('Sky-Blue');
     } else {
-      cartIcon.classList.remove('Sky-Blue');
-      cartIcon.classList.add('green');
+        $(`#${id}`).removeClass('Sky-Blue');
+        $(`#${id}`).addClass('green');
     }
 }
 
 function showCartItems() {
-    const listOfItems = document.getElementById('list-items');
-    const unorderedList = document.createElement('ul');
-    while (listOfItems.firstChild) {
-        listOfItems.removeChild(listOfItems.firstChild);
-    }
-    const itemsContent = carts.length > 0
+    const $listOfItems = $('#list-items');
+    const $unorderedList = $('<ul></ul>');
+    $listOfItems.empty();
+
+    const $itemsContent = carts.length > 0
         ? carts.map(item => `<li>${item}</li>`).join('')
         : 'Empty';
 
-    unorderedList.innerHTML = itemsContent;
-    listOfItems.appendChild(unorderedList);
-    document.getElementsByClassName('list-items')[0].style.visibility = 'visible';
+    $unorderedList.html($itemsContent);
+    $listOfItems.append($unorderedList);
+    $('.list-items').eq(0).css('visibility', 'visible');
 }
 
+function showAddItemsModal(className) {
+    $(`.${className}`).eq(0).css('visibility', 'visible');
+}
