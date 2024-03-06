@@ -29,3 +29,19 @@ function toggleCartColor(id) {
       cartIcon.classList.add('green');
     }
 }
+
+function showCartItems() {
+    const listOfItems = document.getElementById('list-items');
+    const unorderedList = document.createElement('ul');
+    while (listOfItems.firstChild) {
+        listOfItems.removeChild(listOfItems.firstChild);
+    }
+    const itemsContent = carts.length > 0
+        ? carts.map(item => `<li>${item}</li>`).join('')
+        : 'Empty';
+
+    unorderedList.innerHTML = itemsContent;
+    listOfItems.appendChild(unorderedList);
+    document.getElementsByClassName('list-items')[0].style.visibility = 'visible';
+}
+
