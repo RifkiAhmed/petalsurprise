@@ -1,43 +1,50 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="UTF-8" />
     <title>title</title>
-    <link rel="stylesheet" href="./static/styles/index.css">
+    <link rel="stylesheet" href="./static/styles/index.css" />
     <script src="./static/scripts/index.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
 </head>
-<body>
+
+<body style="position: relative;">
+    <div class="list-items">
+        <div class="close" onclick="this.parentElement.style.visibility = 'hidden'">
+            <i class="fas fa-times"></i>
+        </div>
+        <h3 style="margin-top: 50px; text-align: center;">list of items</h3>
+        <div id="list-items">
+        </div>
+    </div>
     <main>
         <div class="menu">
             <nav class="navbar navbar-expand-sm navbar-dark">
-                <!-- Brand/logo -->
                 <a class="navbar-brand" href="#">
-                    <img src="./static/images/flower-tulip.jpg" alt="logo" style="width:40px;">
-                    <h4 style="display: inline-block; color:black">PetalSurprise</h4>
+                    <img src="./static/images/flower-tulip.jpg" alt="logo" style="width: 40px" />
+                    <h4 style="display: inline-block; color: black">PetalSurprise</h4>
                 </a>
-                <!-- Links -->
                 <ul class="navbar-nav">
                     <li class="nav-item">
-                        <a class="nav-link" href="#" style="display: inline-block; color:black">Link 1</a>
+                        <a class="nav-link" href="#" style="display: inline-block; color: black">Link 1</a>
                     </li>
                 </ul>
 
-                <ul class="navbar-nav ml-auto" >
+                <ul class="navbar-nav ml-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="#"><i class="fas fa-user fa-2x" style="color: #463f3a"></i></a>
+                        <a class="nav-link" data-toggle="modal" data-target="#loginModal"><i class="fas fa-user fa-2x"
+                                style="color: #463f3a"></i></a>
                     </li>
                 </ul>
             </nav>
-       
-            
         </div>
         <div class="content row">
-            <div class="left_content col-sm-1">  </div>
+            <div class="left_content col-sm-1"></div>
             <!-- medium -->
             <div class="main_content col-sm-10">
                 <!-- content -->
@@ -48,99 +55,93 @@
                     <div class="items_list">
                         <!-- each item -->
                         <div class="item">
-                            <a>
-                                <div>
-                                    <div>
-                                        <div class="item_img">
-                                            <img src="./static/images/flower-tulip.jpg" width="100%">
-                                            <div class="user_buttons row">
-                                                <div class="add_to_cart col-sm-3" onclick="alert('add to cart')">
-                                                    <i class="fas fa-shopping-cart fa-2x"></i>
-                                                </div>
-                                                <div class="buy_item col-sm-8" onclick="alert('buy')">
-                                                    Buy
-                                                </div>
-                                            </div>
-                                            <div class="admin_buttons row">
-                                                <div class="update_item col-sm-3" onclick="alert('update')">
-                                                    <i class="fas fa-sync fa-2x"></i>
-                                                </div>
-                                                <div class="remove_item col-sm-3" onclick="alert('remove')">
-                                                    <i class="fas fa-times fa-2x"></i>
-                                                </div>
-                                            </div>
+                            <div>
+                                <div class="item_img">
+                                    <div class="image-placeholder">
+                                        <img src="./static/images/flower-tulip.jpg" width="100%" />
+                                    </div>
+                                    <div class="user_buttons row">
+                                        <div class="add_to_cart col-sm-3" onclick="addToCart(1)">
+                                            <i id="1" class="fas fa-shopping-cart fa-2x"></i>
                                         </div>
-                                        <!-- name -->
-                                        <div>
-                                            <div><h6>Tulip</h6></div>
-                                            <span><h4>Tulip # 2515</h4></span>
+                                        <div class="buy_item col-sm-8" onclick="alert('buy')">
+                                            Buy
                                         </div>
-                                        <!-- price -->
-                                        <div>
-                                            <div class="item_price">
-                                                <h5>Price</h5>
-                                                <h5>$20</h5>
-                                            </div>
-                                            <div></div>
+                                    </div>
+                                    <div class="admin_buttons row">
+                                        <div class="update_item col-sm-3" onclick="alert('update')">
+                                            <i class="fas fa-sync fa-2x"></i>
+                                        </div>
+                                        <div class="remove_item col-sm-3" onclick="alert('remove')">
+                                            <i class="fas fa-times fa-2x"></i>
                                         </div>
                                     </div>
                                 </div>
-                            </a>
+                                <!-- name -->
+                                <div>
+                                    <div>
+                                        <h6>Tulip</h6>
+                                    </div>
+                                    <span>
+                                        <h4>Tulip # 2515</h4>
+                                    </span>
+                                </div>
+                                <!-- price -->
+                                <div>
+                                    <div class="item_price">
+                                        <h5>Price</h5>
+                                        <h5>$20</h5>
+                                    </div>
+                                    <div></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="item">
+                            <div>
+                                <div class="item_img">
+                                    <img src="./static/images/flower-tulip.jpg" width="100%" />
+                                    <div class="user_buttons row">
+                                        <div class="add_to_cart col-sm-3" onclick="addToCart(2)">
+                                            <i id="2" class="fas fa-shopping-cart fa-2x"></i>
+                                        </div>
+                                        <div class="buy_item col-sm-8" onclick="alert('buy')">
+                                            Buy
+                                        </div>
+                                    </div>
+                                    <div class="admin_buttons row">
+                                        <div class="update_item col-sm-3" onclick="alert('update')">
+                                            <i class="fas fa-sync fa-2x"></i>
+                                        </div>
+                                        <div class="remove_item col-sm-3" onclick="alert('remove')">
+                                            <i class="fas fa-times fa-2x"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- name -->
+                                <div>
+                                    <div>
+                                        <h6>Tulip</h6>
+                                    </div>
+                                    <span>
+                                        <h4>Tulip # 2515</h4>
+                                    </span>
+                                </div>
+                                <!-- price -->
+                                <div>
+                                    <div class="item_price">
+                                        <h5>Price</h5>
+                                        <h5>$20</h5>
+                                    </div>
+                                    <div></div>
+                                </div>
+                            </div>
                         </div>
                         <div class="item">
                             <a>
                                 <div>
                                     <div>
                                         <div class="item_img">
-                                            <img src="./images/flower-tulip.jpg" width="100%">
-                                        </div>
-                                        <!-- name -->
-                                        <div>
-                                            <div>Tulip</div>
-                                            <span>Tulip # 2515</span>
-                                        </div>
-                                        <!-- price -->
-                                        <div>
-                                            <div class="item_price">
-                                                <p>Price</p>
-                                                <p>$20</p>
-                                            </div>
-                                            <div></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </a>
-                        </div>
-                        <div class="item">
-                            <a>
-                                <div>
-                                    <div>
-                                        <div class="item_img">
-                                            <img src="./images/flower-tulip.jpg" width="100%">
-                                        </div>
-                                        <!-- name -->
-                                        <div>
-                                            <div>Tulip</div>
-                                            <span>Tulip # 2515</span>
-                                        </div>
-                                        <!-- price -->
-                                        <div>
-                                            <div class="item_price">
-                                                <p>Price</p>
-                                                <p>$20</p>
-                                            </div>
-                                            <div></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </a>
-                        </div>
-                        <div class="item">
-                            <a>
-                                <div>
-                                    <div>
-                                        <div class="item_img">
-                                            <img src="./images/flower-tulip.jpg" width="100%">
+                                            <img src="./images/flower-tulip.jpg" width="100%" />
                                         </div>
                                         <!-- name -->
                                         <div>
@@ -164,7 +165,33 @@
                                 <div>
                                     <div>
                                         <div class="item_img">
-                                            <img src="./images/flower-tulip.jpg" width="100%">
+                                            <div class="image-placeholder">
+                                                <img src="./images/flower-tulip.jpg" width="100%" />
+                                            </div>
+                                        </div>
+                                        <!-- name -->
+                                        <div>
+                                            <div>Tulip</div>
+                                            <span>Tulip # 2515</span>
+                                        </div>
+                                        <!-- price -->
+                                        <div>
+                                            <div class="item_price">
+                                                <p>Price</p>
+                                                <p>$20</p>
+                                            </div>
+                                            <div></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="item">
+                            <a>
+                                <div>
+                                    <div>
+                                        <div class="item_img">
+                                            <img src="./images/flower-tulip.jpg" width="100%" />
                                         </div>
                                         <!-- name -->
                                         <div>
@@ -188,10 +215,15 @@
             </div>
             <div class="right_content col-sm-1">
                 <div class="shopping">
-                    <div class="cart">
+                    <div class="cart" onclick="showCartItems()">
                         <i class="fas fa-shopping-cart fa-2x"></i>
                     </div>
+                    <br>
                     <div>
+                        <i class="fas fa-cog settings-icon fa-2x"></i>
+                    </div>
+
+                    <div data-toggle="modal" data-target="#addItemModal">
                         <span id="badge" class="badge badge-light">0</span>
                     </div>
                 </div>
@@ -199,6 +231,52 @@
         </div>
         <footer></footer>
     </main>
-    <script> <!-- .. --> </script>
+
+    <!-- The Login Modal -->
+    <div class="modal fade" id="loginModal">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h4 class="modal-title">Login</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+
+                <!-- Modal body -->
+                <div class="modal-body">
+                    <div class="container">
+                        <form action="#">
+                            <div class="form-group">
+                                <label for="email">Email:</label>
+                                <input type="email" class="form-control" id="email" placeholder="Enter email"
+                                    name="email">
+                            </div>
+                            <div class="form-group">
+                                <label for="pwd">Password:</label>
+                                <input type="password" class="form-control" id="pwd" placeholder="Enter password"
+                                    name="password">
+                            </div>
+                            <button type="submit" class="btn btn-outline-primary">
+                                <!-- <span class="spinner-grow spinner-grow-sm"></span> -->
+                                Connect
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Modal footer -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Close</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        <!-- .. -->
+    </script>
 </body>
+
 </html>
