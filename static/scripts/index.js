@@ -15,6 +15,17 @@ function addToCart(id) {
         toggleCartColor(id);
     }
     catch (err) {
-        alert(err.message);
+        console.error(err.message);
+    }
+}
+
+function toggleCartColor(id) {
+    var cartIcon = document.getElementById(id);
+    if (cartIcon.classList.contains('green')) {
+      cartIcon.classList.remove('green');
+      cartIcon.classList.add('Sky-Blue');
+    } else {
+      cartIcon.classList.remove('Sky-Blue');
+      cartIcon.classList.add('green');
     }
 }
