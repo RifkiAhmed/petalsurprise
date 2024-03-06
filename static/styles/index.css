@@ -1,13 +1,16 @@
 body {
     padding: 0px;
     margin: 0px;
-
     box-sizing: content-box;
 }
 
 .menu {
     height: 70px;
     background-color: #cbc0d3;
+}
+
+.fa-user:hover {
+    cursor: pointer;
 }
 
 .content {
@@ -56,9 +59,12 @@ body {
 }
 
 .item_img:hover .user_buttons,
-.item_img:hover .admin_buttons
- {
+.item_img:hover .admin_buttons {
     visibility: visible;
+}
+
+.image-placeholder {
+    height: 305px;
 }
 
 .admin_buttons {
@@ -111,15 +117,24 @@ body {
 }
 
 .fa-shopping-cart {
-    padding: 8px; color: #61a5c2; background-color: #272640; border-radius: 8px;
+    padding: 8px;
+    color: #61a5c2;
+    background-color: #272640;
+    border-radius: 8px;
 }
 
 .fa-sync {
-    padding: 8px; color: #90be6d; background-color: #272640; border-radius: 8px;
+    padding: 8px;
+    color: #90be6d;
+    background-color: #272640;
+    border-radius: 8px;
 }
 
 .fa-times {
-    padding: 8px 13px ; color: #f94144; background-color: #272640; border-radius: 8px;
+    padding: 8px 13px ;
+    color: #f94144;
+    background-color: #272640;
+    border-radius: 8px;
 }
 
 .right_content {
@@ -129,21 +144,69 @@ body {
 
 }
 
-.cart {
+.shopping {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     padding: 40px 10px;
     margin-top: 20px;
     background-color: #272640;
     border-radius: 8px;
 }
 
-.shopping {
-    position: relative;
+.settings-icon {
+    color: #61a5c2;
 }
 
 .badge {
     position: absolute;
-    top: 50px;
+    top: 30px;
     right: 10px;
+}
+
+.cart:hover {
+    cursor: pointer;
+}
+
+.list-items, .add-new-item {
+    visibility: hidden;
+    position: absolute;
+    padding: 5px;
+    width: 500px;
+    background-color: #9a8c98;
+    right: 0px;
+    height: 100vh;
+    z-index: 1;
+}
+
+.green {
+    color: green;
+}
+  
+.Sky-Blue {
+    color: 61a5c2;
+}
+
+.sign-up {
+    color: #fb8500;
+}
+
+.sign-up:hover {
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+
+
+button[type="submit"] {
+    display: inline-block;
+    width: 90px;
+    margin: auto;
+}
+
+.confirm-pwd, .btn-sign-up {
+    display: none;
 }
 
 footer {
