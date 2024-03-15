@@ -2,7 +2,7 @@
 """
 Contains Product class
 """
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, String, Float
 from models.basemodel import BaseModel, Base
 
 
@@ -11,5 +11,5 @@ class Product(BaseModel, Base):
     """
     __tablename__ = "products"
     name = Column(String(250), nullable=False)
-    price = Column(Integer, nullable=False)
+    price = Column(Float, nullable=False)
     img_path = Column(String(250), nullable=False)
