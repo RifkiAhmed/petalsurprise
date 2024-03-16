@@ -11,5 +11,6 @@ class User(BaseModel, Base):
     """
     __tablename__ = "users"
     email = Column(String(250), nullable=False)
+    username = Column(String(250), nullable=True)
     hashed_password = Column(String(250), nullable=False)
     session_id = Column(String(250), nullable=True)
