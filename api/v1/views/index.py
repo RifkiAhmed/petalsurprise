@@ -19,7 +19,7 @@ def index():
     user = AUTH.get_user_from_session_id(session_id)
     current_page = request.args.get('page', 1, type=int)
     per_page = 32
-    products = storage.get(current_page - 1, per_page)
+    products = storage.get_limit(current_page - 1, per_page)
     size = storage.count(Product)
     page = {'has_prev': True, 'has_next': True, 'num': current_page}
 
