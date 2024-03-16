@@ -67,11 +67,10 @@ class Auth:
         except NoResultFound:
             return None
 
-    def update_password(self, session_id, new_password: str) -> None:
+    def update_password(self, user, new_password: str) -> None:
         """Updates user's password
         """
         try:
-            user = self.get_user_from_session_id(session_id)
             hash_password = _hash_password(new_password)
             return storage.update(user, hashed_password=hash_password)
         except NoResultFound:
