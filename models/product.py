@@ -1,8 +1,8 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3
 """
 Contains Product class
 """
-from sqlalchemy import Column, String, Float
+from sqlalchemy import Column, String, Integer
 from models.basemodel import BaseModel, Base
 
 
@@ -11,5 +11,5 @@ class Product(BaseModel, Base):
     """
     __tablename__ = "products"
     name = Column(String(250), nullable=False)
-    price = Column(Float, nullable=False)
+    price = Column(Integer, nullable=False)
     img_path = Column(String(250), nullable=False)
