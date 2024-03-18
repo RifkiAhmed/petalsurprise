@@ -1,9 +1,9 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 """
-Contains Product class
+Product model
 """
-from sqlalchemy import Column, String, Integer
 from models.basemodel import BaseModel, Base
+from sqlalchemy import Column, String, Integer
 
 
 class Product(BaseModel, Base):
