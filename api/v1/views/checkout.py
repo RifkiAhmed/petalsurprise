@@ -50,8 +50,8 @@ def create_checkout_session():
             'products': ', '.join(map(str, ids))}
         },
         mode='payment',
-        # success_url='http://localhost:5000?success',
-        # cancel_url='http://localhost:5000?cancel',
+        success_url='http://localhost:5000?success',
+        cancel_url='http://localhost:5000?cancel',
     )
     return jsonify({'sessionId': session.id})
 
