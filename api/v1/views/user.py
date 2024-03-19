@@ -2,12 +2,11 @@
 """
 User view for the API
 """
-from flask import abort, jsonify, request, render_template
 from api.v1.views import views
-from models.auth import Auth
 from datetime import datetime, timedelta
-
-AUTH = Auth()
+from flask import abort, jsonify, request, render_template
+from models import storage, AUTH
+from models.order import Order
 
 
 @views.route("/users", methods=["POST"])
@@ -50,13 +49,8 @@ def logout() -> None:
         abort(403)
     AUTH.destroy_session(user)
     response = jsonify({})
-    response.set_cookie(
-        "session_id",
-        "",
-        expires=datetime.now() +
-        timedelta(
-            days=-
-            1))
+    response.set_cookie("session_id", "",
+                        expires=datetime.now() + timedelta(days=-1))
     return response
 
 
@@ -73,19 +67,31 @@ def profile() -> str:
     return render_template('/profile.html', user=user, email=user.email)
 
 
-@views.route("/reset_password", methods=["PUT"])
-def update_password() -> str:
-    """ User password reset
+@views.route("/profile", methods=["PUT"])
+def update_profile() -> str:
+    """ Update user profile
     """
-    new_password = request.form.get("newPassword")
     session_id = request.cookies.get("session_id")
+    email = request.form.get("email")
+    username = request.form.get("username")
+    current_password = request.form.get("currentPassword")
+    new_password = request.form.get("password")
     if not session_id:
         abort(401)
     try:
         user = AUTH.get_user_from_session_id(session_id)
         if not user:
             abort(403)
-        AUTH.update_password(user, new_password)
-        return jsonify({"message": "Password updated"}), 200
+        if username:
+            storage.update(user, username=username)
+            return jsonify({"message": "Username updated"}), 200
+        if email:
+            storage.update(user, email=email)
+            return jsonify({"message": "Email updated"}), 200
+        if new_password:
+            if not AUTH.valid_login(user.email, current_password):
+                abort(401)
+            AUTH.update_password(user, new_password=new_password)
+            return jsonify({"message": "Password updated"}), 200
     except ValueError:
         abort(403)

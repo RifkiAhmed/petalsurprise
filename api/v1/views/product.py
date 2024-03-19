@@ -9,8 +9,8 @@ from models import storage
 from datetime import datetime
 import os
 
-FORMAT = "%Y%m%d%H%M%S"
-
+FORMAT = '%Y%m%d%H%M%S'
+PATH = 'api/v1/static/flowers'
 
 @views.route("/products", methods=["POST"])
 def add_products() -> str:
@@ -21,7 +21,7 @@ def add_products() -> str:
     image = request.files['image']
     file_extension = os.path.splitext(image.filename)[1]
     filename = f'img_{datetime.now().strftime(FORMAT)}{file_extension}'
-    file_path = f'api/v1/static/products/{filename}'
+    file_path = f'{PATH}/{filename}'
     product = Product(name=name, price=int(price), img_path=filename)
     storage.add(product)
     image.save(file_path)
@@ -48,10 +48,10 @@ def update_product() -> str:
     image = request.files.get('image')
     product = storage.find_by(Product, id=id)
     if image:
-        os.remove(f'api/v1/static/products/{product.path}')
+        os.remove(f'{PATH}/{product.path}')
         file_extension = os.path.splitext(image.filename)[1]
         filename = f'img_{datetime.now().strftime(FORMAT)}{file_extension}'
-        file_path = f'api/v1/static/products/{filename}'
+        file_path = f'{PATH}/{filename}'
         image.save(file_path)
         storage.update(product, name=name, price=int(price), img_path=filename)
     else:

@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-""" Auth model
+"""
+Auth Class
 """
 import bcrypt
 from models import storage
 from models.user import User
 from sqlalchemy.orm.exc import NoResultFound
-from sqlalchemy.exc import InvalidRequestError
 import uuid
 
 
@@ -27,14 +27,14 @@ class Auth:
     """Auth class to interact with the authentication database.
     """
 
-    def register_user(self, email: str, password: str) -> User:
+    def register_user(self, email: str, password: str) -> None:
         """Registers a new user into the database
         """
         try:
             storage.find_by(User, email=email)
         except NoResultFound:
             user = User(email=email, hashed_password=_hash_password(password))
-            return storage.add(user)
+            storage.add(user)
         raise ValueError(f"User {email} already exists")
 
     def valid_login(self, email: str, password: str) -> bool:
@@ -80,3 +80,4 @@ class Auth:
         """Destroys user's session
         """
         storage.update(user, session_id=None)
+        return None

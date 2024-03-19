@@ -1,6 +1,6 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3
 """
-Contains User class
+User model
 """
 from sqlalchemy import Column, String
 from models.basemodel import BaseModel, Base
