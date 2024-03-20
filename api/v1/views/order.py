@@ -100,3 +100,21 @@ def orders() -> str:
         pass
     orders_data = _orders_data(orders)
     return orders_data
+
+
+@views.route("/orders", methods=["PUT"])
+def update_order() -> str:
+    """ Update order status
+    """
+    user = None
+    session_id = request.cookies.get("session_id")
+    if session_id:
+        user = AUTH.get_user_from_session_id(session_id)
+    if not user:
+        abort(403)
+    id = request.form.get('id')
+    status = request.form.get('status')
+    order = storage.find_by(Order, id=id)
+    if order:
+        storage.update(order, status=status)
+    return jsonify({})
