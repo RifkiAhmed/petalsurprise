@@ -102,18 +102,22 @@ def charge_refund():
     """ Refund customer
     """
     session_id = request.cookies.get('session_id')
-    if session_id:
-        user = AUTH.get_user_from_session_id(session_id=session_id)
-        if not user:
-            abort(403)
+    if not session_id:
+        abort(401)
+    user = AUTH.get_user_from_session_id(session_id=session_id)
+    if not user:
+        abort(403)
 
     order_id = request.form.get('orderId')
     charge_id = request.form.get('chargeId')
     if order_id and charge_id:
-        refund = stripe.Refund.create(charge=charge_id,)
-        # print("Refund successful:", refund)
-        order = storage.find_by(Order, id=order_id)
-        # print('status: ', order.status)
-        storage.update(order, status="Refunded")
-        # print('status: ', order.status)
+        try:
+            refund = stripe.Refund.create(charge=charge_id,)
+            # print("Refund successful:", refund)
+            order = storage.find_by(Order, id=order_id)
+            # print('status: ', order.status)
+            storage.update(order, status="Refunded")
+            # print('status: ', order.status)
+        except Exception as e:
+            return jsonify({"message": e.message})
     return jsonify({})
