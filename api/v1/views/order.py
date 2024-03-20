@@ -77,3 +77,26 @@ def dashboard() -> str:
     except NoResultFound:
         pass
     return render_template('/dashboard.html', user=user, orders=orders)
+
+
+@views.route("/orders", methods=["GET"])
+def orders() -> str:
+    """ Returns all orders with the specified status
+    """
+    user = None
+    session_id = request.cookies.get("session_id")
+    if session_id:
+        user = AUTH.get_user_from_session_id(session_id)
+    if not user:
+        abort(403)
+    orders = None
+    status = request.args.get('status')
+    try:
+        if status == 'Default':
+            orders = storage.all(Order)
+        else:
+            orders = storage.find_all(Order, status=status)
+    except NoResultFound:
+        pass
+    orders_data = _orders_data(orders)
+    return orders_data
