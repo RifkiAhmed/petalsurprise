@@ -3,7 +3,7 @@
 Checkout view for the API
 """
 from api.v1.views import views
-from flask import jsonify, request
+from flask import jsonify, request, abort
 from models import storage, AUTH
 from models.order import Order
 from models.product import Product
@@ -72,7 +72,9 @@ def stripe_webhook():
 
     # Handle payment_intent.succeeded event
     if event['type'] == 'payment_intent.succeeded':
+        # print(event)
         payment_intent = event['data']['object']
+        charge_id = payment_intent.get('latest_charge')
         payment_method_type = payment_intent.get('payment_method_types')
         amount = int(payment_intent.get('amount_received'))
         currency = payment_intent.get('currency')
@@ -86,10 +88,32 @@ def stripe_webhook():
         order = Order(user_id=user_id, recipient_name=recipient_name,
                       recipient_address=recipient_address, message=message,
                       payment_method_type=payment_method_type, amount=amount,
-                      currency=currency)
+                      currency=currency, charge_id=charge_id)
         storage.add(order)
         for product_id in products_ids:
             product = storage.find_by(Product, id=int(product_id))
             order.products.append(product)
         storage.save()
     return 'Success', 200
+
+
+@views.route('/refund', methods=['PUT'])
+def charge_refund():
+    """ Refund customer
+    """
+    session_id = request.cookies.get('session_id')
+    if session_id:
+        user = AUTH.get_user_from_session_id(session_id=session_id)
+        if not user:
+            abort(403)
+
+    order_id = request.form.get('orderId')
+    charge_id = request.form.get('chargeId')
+    if order_id and charge_id:
+        refund = stripe.Refund.create(charge=charge_id,)
+        # print("Refund successful:", refund)
+        order = storage.find_by(Order, id=order_id)
+        # print('status: ', order.status)
+        storage.update(order, status="Refunded")
+        # print('status: ', order.status)
+    return jsonify({})
