@@ -22,11 +22,11 @@ class Order(BaseModel, Base):
     recipient_name = Column(String(250), nullable=False)
     recipient_address = Column(String(250), nullable=False)
     message = Column(String(250), nullable=True)
-    products = relationship(
-        'Product',
-        secondary=order_product_association,
-        backref='orders')
+    products = relationship('Product',
+                            secondary=order_product_association,
+                            backref='orders')
     payment_method_type = Column(String(250), nullable=True)
     amount = Column(Integer, nullable=True)
     currency = Column(String(250), nullable=True)
     status = Column(String(250), default="Pending", nullable=True)
+    charge_id = Column(String(250), nullable=False)
