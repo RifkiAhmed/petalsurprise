@@ -1,0 +1,44 @@
+.sign-up {
+    color: #fb8500;
+    cursor: pointer;
+}
+
+.sign-up:hover {
+    text-decoration: underline;
+}
+
+.confirm-pwd,
+.btn-sign-up {
+    display: none;
+}
+
+.container {
+    border-radius: 8px;
+    color: #ffffff;
+}
+
+.user-login {
+    border: 1px solid #ffffff;
+    padding: 30px;
+}
+
+h3 {
+    padding: 20px 0px;
+}
+
+h6 {
+    text-align: center;
+}
+
+.btn-connect,
+.btn-sign-up {
+    background-color: #272640;
+    color: #ffffff;
+}
+
+.btn-connect:hover,
+.btn-sign-up:hover {
+    background-color: rgba(39, 38, 64, 0.6);
+    color: #ffffff;
+    border: 1px solid #ffffff;
+}
