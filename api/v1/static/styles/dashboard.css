@@ -1,0 +1,169 @@
+/* Plus column */
+th:nth-child(1) {
+  width: 1%;
+}
+
+/* Date column */
+th:nth-child(2) {
+  width: 12%;
+}
+
+/* Recipient column */
+th:nth-child(3) {
+  width: 15%;
+}
+
+/* Address column */
+th:nth-child(4) {
+  width: 20%;
+}
+
+/* Message column */
+th:nth-child(5) {
+  width: 30%;
+}
+
+/* Item column */
+th:nth-child(6) {
+  width: 5%;
+}
+
+/* Amount column */
+th:nth-child(7) {
+  width: 5%;
+}
+
+/* Status column */
+th:nth-child(8) {
+  width: 6%;
+}
+
+/* Action columns */
+th:nth-child(9) {
+  width: 2%;
+  text-align: center;
+}
+
+@keyframes moveRight {
+  from {
+    transform: translateX(-5px);
+  }
+
+  to {
+    transform: translateX(5px);
+  }
+}
+
+@keyframes zoomIn {
+  from {
+    transform: scale(1);
+  }
+
+  to {
+    transform: scale(1.5);
+  }
+}
+
+.fa-truck:hover {
+  animation: moveRight 1s linear infinite alternate;
+}
+
+.fa-times:hover,
+.fa-check:hover,
+.fa-money-check-alt:hover {
+  animation: zoomIn 1s ease-in-out infinite alternate;
+}
+
+.content {
+  color: #ffffff;
+}
+
+.list-group {
+  margin-top: 30px;
+}
+
+.list-group a {
+  background-color: inherit;
+  color: #ffffff;
+  text-decoration: none;
+  width: 100%;
+  border: 0px;
+  cursor: pointer;
+}
+
+.list-group-item:hover {
+  background-color: rgba(169, 169, 169, 0.4) !important;
+}
+
+li {
+  background-color: inherit !important;
+  border: 0px;
+}
+
+.side-nav {
+  position: fixed;
+  flex: 1;
+  margin: 0px;
+  padding: 0px;
+  height: 100vh;
+  z-index: 1;
+  background-color: rgb(169, 169, 169, 0.1);
+}
+
+.data-display {
+  flex: 2;
+}
+
+.orders-overview a {
+  text-decoration: none;
+}
+
+.footer {
+  position: absolute;
+  bottom: 0px;
+  text-align: center;
+  width: 100%;
+  border-top: 3px solid;
+  border-image: radial-gradient(circle at top, #427aa1, #ebf2fa);
+  border-image-slice: 1;
+  text-align: center;
+  padding: 20px;
+  color: #ffffff;
+}
+
+.btn-search {
+  background-color: inherit;
+  color: #ffffff;
+}
+
+.card {
+  color: #000000;
+  width: 250px;
+  margin: 10px;
+  text-align: center;
+  user-select: none;
+}
+
+.Pending {
+  background-color: #ffc107;
+}
+
+.Delivering {
+  background-color: #17a2b8;
+}
+
+.Delivered {
+  background-color: #28a745;
+}
+
+.Cancelled {
+  background-color: #dc3545; 
+}
+
+.Refunded {
+  background-color: #6c757d;
+}
+
+.chart {
+  margin-top: 50px;
+}
