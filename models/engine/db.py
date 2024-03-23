@@ -3,7 +3,7 @@
 DB model
 """
 from models.basemodel import Base
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, and_, func
 from sqlalchemy.orm import sessionmaker, scoped_session
 from sqlalchemy.orm.session import Session
 from sqlalchemy.orm.exc import NoResultFound
@@ -76,8 +76,33 @@ class DB:
         products = self._session.query(cls).slice(start, end).all()
         return products
 
+    def get_range_filter(self, cls, min_price, max_price):
+        """Returns the objects corresponding to the page of size per_page
+        """
+        # start = page * per_page
+        # end = start + per_page
+        # products_count = self.count(cls)
+        if min_price and max_price:
+            return self._session.query(cls).filter(and_(
+                cls.price >= min_price, cls.price <= max_price)).all()
+        elif min_price:
+            return self._session.query(cls).filter(
+                cls.price >= min_price).all()
+        elif max_price:
+            return self._session.query(cls).filter(
+                cls.price <= max_price).all()
+
+    def get_string_filter(self, cls, search_name):
+        """ Returns the objects corresponding to the page of size per_page
+        """
+        # start = page * per_page
+        # end = start + per_page
+        # products_count = self.count(cls)
+        return self._session.query(cls) \
+            .filter(cls.name.like(f'%{search_name}%')).all()
+
     def find_by(self, cls, **kwargs):
-        """Returns the first object based on the given keyword argument
+        """ Returns the first object based on the given keyword argument
         """
         obj = self._session.query(cls).filter_by(**kwargs).first()
         if not obj:
@@ -85,12 +110,25 @@ class DB:
         return obj
 
     def find_all(self, cls, **kwargs):
-        """Returns all the objects based on the given keyword argument
+        """ Returns all the objects based on the given keyword argument
         """
         objs = self._session.query(cls).filter_by(**kwargs).all()
-        if not objs:
-            raise NoResultFound
         return objs
+
+    def orders_overview(self, cls):
+        """ Returns all the objects based on the given keyword argument
+        """
+        stats_1 = self._session.query(cls.status, func.count(cls.id) \
+                                    .label('count_orders'), \
+                                        func.sum(cls.amount).label('total_amount')) \
+                                        .group_by(cls.status) \
+                                        .all()
+        stats_2 = self._session.query(func.date(cls.created_at).label('creation_date'),
+                                     func.count(cls.id).label('count_orders'),
+                                     func.sum(cls.amount).label('total_amount')) \
+                                        .group_by(func.date(cls.created_at)) \
+                                        .all()
+        return [stats_1, stats_2]
 
     def update(self, obj, **kwargs) -> None:
         """ Updates object attributes with the given key-value pairs
