@@ -2,8 +2,8 @@
 """
 Order view for the API
 """
-from api.v1.views import views
-from datetime import datetime
+from api.v1.views import views, _user_logged_in
+from datetime import datetime, timedelta
 from flask import abort, jsonify, request, render_template
 from models import storage, AUTH
 from models.order import Order
@@ -47,28 +47,56 @@ def _orders_data(orders):
 def user_activity() -> str:
     """ User orders history
     """
-    session_id = request.cookies.get("session_id")
-    if not session_id:
+    user = _user_logged_in(request)
+    if not user:
         abort(401)
     try:
-        user = AUTH.get_user_from_session_id(session_id)
-        if not user:
-            abort(403)
         orders = storage.find_all(Order, user_id=user.id)
-        orders_data = _orders_data(orders)
-        return jsonify(orders_data), 200
+        _orders = _orders_data(orders)
+        return _orders, 200
     except ValueError:
         abort(403)
 
 
-@views.route("/dashboard", methods=["GET"])
-def dashboard() -> str:
+@views.route("/dashboard/overview", methods=["GET"])
+def dashboard_overview() -> str:
     """ Admin dashboard
     """
-    user = None
-    session_id = request.cookies.get("session_id")
-    if session_id:
-        user = AUTH.get_user_from_session_id(session_id)
+    user = _user_logged_in(request)
+    if not user:
+        abort(403)
+    try:
+        stats_1, stats_2 = storage.orders_overview(Order)
+        status = {
+            "Pending": None,
+            "Delivering": None,
+            "Delivered": None,
+            "Cancelled": None,
+            "Refunded": None}
+        i = 0
+        for stat in stats_1:
+            status[stat[0]] = [stat[1], stat[2] // 100]
+        stats_2_dicts = []
+        for stat in stats_2:
+            stat_dict = {
+                "date": str(
+                    stat[0]), "count": stat[1], "total_amount": int(
+                    stat[2]) // 100}
+            stats_2_dicts.append(stat_dict)
+        return render_template(
+            '/dashboard_overview.html',
+            user=user,
+            stats=status,
+            data=stats_2_dicts)
+    except NoResultFound:
+        return render_template('/dashboard_overview.html', user=user)
+
+
+@views.route("/dashboard/orders", methods=["GET"])
+def dashboard_orders() -> str:
+    """ Admin dashboard
+    """
+    user = _user_logged_in(request)
     if not user:
         abort(403)
     orders = []
@@ -76,21 +104,20 @@ def dashboard() -> str:
         orders = storage.find_all(Order, status="Pending")
     except NoResultFound:
         pass
-    return render_template('/dashboard.html', user=user, orders=orders)
+    return render_template('/dashboard_orders.html', user=user, orders=orders)
 
 
 @views.route("/orders", methods=["GET"])
 def orders() -> str:
     """ Returns all orders with the specified status
     """
-    user = None
-    session_id = request.cookies.get("session_id")
-    if session_id:
-        user = AUTH.get_user_from_session_id(session_id)
+    user = _user_logged_in(request)
     if not user:
         abort(403)
     orders = None
     status = request.args.get('status')
+    from_date = request.args.get('from')
+    to_date = request.args.get('to')
     try:
         if status == 'Default':
             orders = storage.all(Order)
@@ -98,18 +125,24 @@ def orders() -> str:
             orders = storage.find_all(Order, status=status)
     except NoResultFound:
         pass
-    orders_data = _orders_data(orders)
-    return orders_data
+    orders_data = orders
+    if from_date:
+        from_date = datetime.fromisoformat(from_date)
+        orders_from = [o for o in orders if o.created_at >= from_date]
+        orders_data = orders_from
+    if to_date:
+        to_date = datetime.fromisoformat(to_date) + timedelta(days=1)
+        orders_to = [o for o in orders_data if o.created_at <= to_date]
+        orders_data = orders_to
+    orders_data_dict = _orders_data(orders_data)
+    return orders_data_dict
 
 
 @views.route("/orders", methods=["PUT"])
 def update_order() -> str:
     """ Update order status
     """
-    user = None
-    session_id = request.cookies.get("session_id")
-    if session_id:
-        user = AUTH.get_user_from_session_id(session_id)
+    user = _user_logged_in(request)
     if not user:
         abort(403)
     id = request.form.get('id')
