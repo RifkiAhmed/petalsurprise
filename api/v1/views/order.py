@@ -2,7 +2,7 @@
 """
 Order view for the API
 """
-from api.v1.views import views, _user_logged_in
+from api.v1.views import views
 from datetime import datetime, timedelta
 from flask import abort, jsonify, request, render_template
 from models import storage, AUTH
@@ -47,7 +47,7 @@ def _orders_data(orders):
 def user_activity() -> str:
     """ User orders history
     """
-    user = _user_logged_in(request)
+    user = AUTH.get_user_from_session_id(request.cookies.get('session_id'))
     if not user:
         abort(401)
     try:
@@ -62,8 +62,8 @@ def user_activity() -> str:
 def dashboard_overview() -> str:
     """ Admin dashboard
     """
-    user = _user_logged_in(request)
-    if not user:
+    user = AUTH.get_user_from_session_id(request.cookies.get('session_id'))
+    if not user or not user.is_admin:
         abort(403)
     try:
         stats_1, stats_2 = storage.orders_overview(Order)
@@ -96,8 +96,8 @@ def dashboard_overview() -> str:
 def dashboard_orders() -> str:
     """ Admin dashboard
     """
-    user = _user_logged_in(request)
-    if not user:
+    user = AUTH.get_user_from_session_id(request.cookies.get('session_id'))
+    if not user or not user.is_admin:
         abort(403)
     orders = []
     try:
@@ -111,8 +111,8 @@ def dashboard_orders() -> str:
 def orders() -> str:
     """ Returns all orders with the specified status
     """
-    user = _user_logged_in(request)
-    if not user:
+    user = AUTH.get_user_from_session_id(request.cookies.get('session_id'))
+    if not user or not user.is_admin:
         abort(403)
     orders = None
     status = request.args.get('status')
@@ -142,8 +142,8 @@ def orders() -> str:
 def update_order() -> str:
     """ Update order status
     """
-    user = _user_logged_in(request)
-    if not user:
+    user = AUTH.get_user_from_session_id(request.cookies.get('session_id'))
+    if not user or not user.is_admin:
         abort(403)
     id = request.form.get('id')
     status = request.form.get('status')
