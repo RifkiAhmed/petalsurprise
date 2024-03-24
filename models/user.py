@@ -15,4 +15,3 @@ class User(BaseModel, Base):
     hashed_password = Column(String(250), nullable=False)
     session_id = Column(String(250), nullable=True)
     is_admin = Column(Boolean, default=False)
-    status = Column(String(250), nullable=True)
