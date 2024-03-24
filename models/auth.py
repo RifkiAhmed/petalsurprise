@@ -34,7 +34,7 @@ class Auth:
             storage.find_by(User, email=email)
         except NoResultFound:
             user = User(email=email, hashed_password=_hash_password(password))
-            storage.add(user)
+            return storage.add(user)
         raise ValueError(f"User {email} already exists")
 
     def valid_login(self, email: str, password: str) -> bool:
@@ -62,10 +62,30 @@ class Auth:
     def get_user_from_session_id(self, session_id: str) -> User:
         """Returns user object based on it's session id
         """
+        if not session_id:
+            return None
         try:
             return storage.find_by(User, session_id=session_id)
         except NoResultFound:
             return None
+
+    def require_auth(self, request):
+        """ Checks if user is logged in or not
+        """
+        paths = {
+            "admin": [
+                '/refund',
+                '/dashboard/overview',
+                '/dashboard/orders',
+                '/orders',
+                '/products'],
+            "users": [
+                '/profile',
+                '/user_orders']}
+        session_id = request.cookies.get('session_id')
+        if not session_id:
+            if request.path in paths['admin'] or request.path in paths['users']:
+                return True
 
     def update_password(self, user, new_password: str) -> None:
         """Updates user's password
