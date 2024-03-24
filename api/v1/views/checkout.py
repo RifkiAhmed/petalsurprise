@@ -15,10 +15,7 @@ stripe.api_key = os.getenv('STRIPE_API_KEY')
 
 @views.route('/create-checkout-session', methods=['POST'])
 def create_checkout_session():
-    session_id = request.cookies.get('session_id')
-    user = None
-    if session_id:
-        user = AUTH.get_user_from_session_id(session_id)
+    user = AUTH.get_user_from_session_id(request.cookies.get('session_id'))
     data = request.get_json()
     cart = data.get('cart', [])
     recipient_name = data.get('recipient_name')
@@ -42,7 +39,7 @@ def create_checkout_session():
         payment_method_types=['card'],
         line_items=list_items,
         payment_intent_data={'metadata': {
-            'user_id': str(user.id),
+            'user_id': str(user.id) if user else None,
             'user_email': user.email,
             'recipient_name': recipient_name,
             'recipient_address': recipient_address,
@@ -101,23 +98,16 @@ def stripe_webhook():
 def charge_refund():
     """ Refund customer
     """
-    session_id = request.cookies.get('session_id')
-    if not session_id:
-        abort(401)
-    user = AUTH.get_user_from_session_id(session_id=session_id)
-    if not user:
+    user = AUTH.get_user_from_session_id(request.cookies.get('session_id'))
+    if not user or not user.is_admin:
         abort(403)
-
     order_id = request.form.get('orderId')
     charge_id = request.form.get('chargeId')
     if order_id and charge_id:
         try:
             refund = stripe.Refund.create(charge=charge_id,)
-            # print("Refund successful:", refund)
             order = storage.find_by(Order, id=order_id)
-            # print('status: ', order.status)
             storage.update(order, status="Refunded")
-            # print('status: ', order.status)
         except Exception as e:
             return jsonify({"message": e.message})
     return jsonify({})
