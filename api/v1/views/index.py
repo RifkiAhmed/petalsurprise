@@ -21,7 +21,6 @@ def index():
     if min_price or max_price:
         products = storage.get_range_filter(Product, min_price, max_price)
     elif search_with_name:
-        print(search_with_name)
         products = storage.get_string_filter(Product, search_with_name)
     else:
         products = storage.get_limit(Product, current_page - 1, per_page)
