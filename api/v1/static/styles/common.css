@@ -1,0 +1,20 @@
+body {
+    background-color: #14213d;
+    padding: 0px;
+}
+
+.fa {
+    cursor: pointer;
+}
+
+.alert {
+    position: fixed;
+    top: 20px;
+    left: 0;
+    right: 0;
+    width: 400px;
+    margin: auto;
+    text-align: center;
+    z-index: 1;
+    display: none;
+}

@@ -1,0 +1,71 @@
+.profile-content {
+    margin-top: 10vh;
+    background-color: rgba(0, 0, 0, 0.4);
+    padding: 80px 15px;
+    border-radius: 8px;
+}
+
+.profile-content > div {
+    display: flex;
+    justify-content: center;
+}
+
+.list-group li {
+    background-color: inherit;
+    border: 0px;
+    border-right: 1px solid #ffffff;
+}
+
+.list-group li:hover {
+    background-color: inherit;
+    opacity: 0.6;
+    cursor: pointer;
+}
+
+.update {
+    float: right;
+    text-decoration: none;
+
+}
+
+div .head {
+    display: flex;
+    justify-content: left;
+    align-items: center;
+    margin-bottom: 40px;
+}
+
+form, .updateEmailForm {
+    max-width: 500px;
+    margin: auto;
+}
+
+#username, #save-username {
+    margin: 0 4px;
+    width: 250px;
+    display: none;
+}
+
+#username-link {
+    font-size: x-large;
+    margin: 0 8px;
+}
+
+.changePasswordForm {
+    display: none;
+}
+
+.fluid-container {
+    background-color: #272640;
+    padding: 50px;
+    border-radius: 8px;
+    margin: 0px auto 100px;
+}
+
+li {
+    color: grey;
+}
+
+label, li:first-child {
+    color: #ffffff;
+}
