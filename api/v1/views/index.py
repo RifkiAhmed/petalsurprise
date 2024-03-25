@@ -8,7 +8,7 @@ from models import storage, AUTH
 from models.product import Product
 import os
 
-@views.route('/', methods=['GET'])
+@views.route('/', methods=['GET', 'POST'])
 def index():
     """Return index page"""
     user = AUTH.get_user_from_session_id(request.cookies.get('session_id'))
