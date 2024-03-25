@@ -6,7 +6,7 @@ from api.v1.views import views
 from flask import render_template, request
 from models import storage, AUTH
 from models.product import Product
-
+import os
 
 @views.route('/', methods=['GET'])
 def index():
@@ -70,7 +70,11 @@ def send_email():
     email = request.form.get('email')
     subject = request.form.get('subject')
     message = request.form.get('message')
-    send_email(subject, message, email)
+    send_email(
+        subject=subject,
+        message=message,
+        sender=email,
+        receiver=os.getenv('USER_MAIL'))
     return ({"message": "Message sent successfully!"})
 
 
