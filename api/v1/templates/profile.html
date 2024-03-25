@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>PetalSurprise</title>
+    <link rel="icon" type="image/png" href="../static/images/icon.png" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"/>
+    <link rel="stylesheet" href="../static/styles/common.css" />
+    <link rel="stylesheet" href="../static/styles/nav.css" />
+    <link rel="stylesheet" href="../static/styles/footer.css" />
+    <link rel="stylesheet" href="../static/styles/profile.css" />
+    <script src="../static/scripts/profile.js"></script>
+    <script src="../static/scripts/auth.js"></script>
+  </head>
+
+  <body>
+    <div class="alert alert-danger">
+      <h6 class="alert_message"> <!-- Message to show --></h6>
+    </div>
+    <div class="alert alert-info">
+      <h6 class="alert_message"> <!-- Message to show --></h6>
+    </div>
+    <!-- Navigation bar -->
+    <ul class="nav nav-pills">
+      <li class="nav-item">
+          <img class="brand" src="../static/images/brand.png" alt="logo" />
+      </li>
+      <li class="nav-item">
+          <a class="nav-link" href="/">Home</a>
+      </li>
+      <li class="nav-item">
+          <a class="nav-link" href="/contact">Contact us</a>
+      </li>
+      <li class="nav-item">
+          <a class="nav-link" href="/about">About</a>
+      </li>
+      <li class="nav-item justify-content-end dropdown dropleft login-icon">
+      {% if user %}
+          <i class="connected fas fa-user-circle fa-3x"data-toggle="dropdown"></i>
+      {% else %}
+          <a href="/auth"><i class="disconnected fas fa-user-circle fa-3x"></i></a>
+      {% endif %}
+          <div class="dropdown-menu">
+              <a class="dropdown-item" href="/profile"><i class="fas fa-user"> </i> Profile</a>
+              <a class="dropdown-item" href="#" onclick="disconnect(event)"> <i class="fas fa-sign-out-alt"></i> Logout</a>
+          </div>
+      </li>
+  </ul>
+
+    <div class="container profile-content">
+      <div class="head">
+        <i class="connected fas fa-user-circle fa-6x"></i>
+        {% if user.username %}
+        <a href="#" id="username-link" onclick="showUserNameInput()">{{user.username}}</a>
+        {% else %}
+        <a href="#" id="username-link" onclick="showUserNameInput()">username</a>
+        {% endif %}
+        <input type="text" class="form-control" id="username" name="username"
+          placeholder="username"/>
+        <span>
+          <a href="#" id="save-username" onclick="updateProfile('username')">save</a>
+        </span>
+      </div>
+
+      <div class="row col-sm-12">
+        <div class="col-sm-2">
+          <ul class="list-group">
+            <li class="list-group-item li-profile" onclick="userProfile()">
+              Profile
+            </li>
+            <li class="list-group-item li-orders" onclick="userOrders()">
+              Orders
+            </li>
+            <li class="list-group-item li-wishes" onclick="userWishes()">
+              Likes
+            </li>
+          </ul>
+        </div>
+
+        <div class="col-sm-10">
+          <!-- Profile -->
+          <form action="#" class="updateEmailForm">
+            <div class="form-group">
+              <label for="name">Email:</label>
+              <a href="#" class="update" onclick="updateProfile('email')">Update</a>
+              <input
+                type="email"
+                class="form-control"
+                id="email"
+                placeholder="{{user.email}}"
+                name="email"
+              />
+            </div>
+            <a href="#" class="updateEmail" onclick="showChangePassword()"
+              >Change password</a
+            >
+          </form>
+
+          <form action="#" class="changePasswordForm">
+            <div class="form-group">
+              <label for="pwd-0">Actual password:</label>
+              <input
+                type="password"
+                class="form-control"
+                id="pwd-0"
+                placeholder="Enter actual password"
+                name="pwd-0"
+              />
+            </div>
+            <div class="form-group">
+              <label for="pwd-1">New password:</label>
+              <input
+                type="password"
+                class="form-control"
+                id="pwd-1"
+                placeholder="Enter new password"
+                name="pwd-1"
+              />
+            </div>
+            <div class="form-group">
+              <label for="pwd-2">Confirm Password:</label>
+              <input
+                type="password"
+                class="form-control"
+                id="pwd-2"
+                placeholder="confirm new password"
+                name="pwd-2"
+              />
+            </div>
+            <a href="#" onclick="updateProfile('password')">Save</a>
+          </form>
+
+          <!-- Orders -->
+          <div class="list-orders"></div>
+
+          <!-- Wishes -->
+          <div class="list-wishes"></div>
+        </div>
+      </div>
+    </div>
+    <footer>2024</footer>
+  </body>
+</html>

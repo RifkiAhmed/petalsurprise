@@ -1,0 +1,15 @@
+.about-artice {
+    font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-size: large;
+    font-weight: bolder;
+    text-align: justify;
+    padding: 10px;;
+}
+
+.card-title, .card-text, .github-link {
+    font-family:'Arial Narrow Bold'
+}
+
+.fa-github {
+    font-size:xx-large;
+}

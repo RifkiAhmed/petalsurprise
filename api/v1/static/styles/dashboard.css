@@ -76,6 +76,8 @@ th:nth-child(9) {
 
 .content {
   color: #ffffff;
+  margin: 0px;
+  padding: 0px;
 }
 
 .list-group {
@@ -166,4 +168,13 @@ li {
 
 .chart {
   margin-top: 50px;
+}
+
+.clear-date {
+  color: #000000;
+  position: absolute;
+  right: 24px;
+  bottom: 8px;
+  background-color: #ffffff;
+  padding: 6px;
 }

@@ -16,6 +16,7 @@
         <link rel="stylesheet" href="../static/styles/footer.css" />
         <link rel="stylesheet" href="../static/styles/dashboard.css" />
         <script src="../static/scripts/profile.js"></script>
+        <script src="../static/scripts/auth.js"></script>
         <script src="../static/scripts/orders.js"></script>
     </head>
 
@@ -65,8 +66,8 @@
                                     <h4>{{ key }}</h4>
                                 </div>
                                 <div class="card-body">
-                                    <p>Total {{ key }} orders: <strong>{{ val[0] }}</strong></p>
-                                    <p>Total amount: <strong>${{ val[1] }}</strong></p>
+                                    <p>Total {{ key }} orders: <strong>{{ val[0] if val[0] else 0 }}</strong></p>
+                                    <p>Total amount: <strong>${{ val[1] if val[1] else 0 }}</strong></p>
                                 </div>
                             </div>
                         {% endfor %}

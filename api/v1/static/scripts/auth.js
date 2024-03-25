@@ -8,11 +8,14 @@ function register(event) {
   if (!emailRegex.test(email)) {
     $('.alert_message').text('Invalid email format');
     $('.alert-danger').css('display', 'block');
+    setTimeout(() => $('.alert-danger').css('display', 'none'), 3000);
     return;
   }
-  if (pwd_1 !== pwd_2) {
+  if (pwd_1 !== pwd_2 || pwd_1 === '') {
     $('.alert_message').text('Passwords do not match');
+    if (pwd_1 === '') { $('.alert_message').text('Password should not be empty'); };
     $('.alert-danger').css('display', 'block');
+    setTimeout(() => $('.alert-danger').css('display', 'none'), 3000);
     return;
   }
   $.ajax({
@@ -25,6 +28,7 @@ function register(event) {
     error: (error) => {
       $('.alert_message').text(error.responseJSON.message);
       $('.alert-danger').css('display', 'block');
+      setTimeout(() => $('.alert-danger').css('display', 'none'), 3000);
       console.log("Error:", error.responseJSON.message);
     }
   });
@@ -35,10 +39,6 @@ function connect(event) {
   const email = $('#email').val();
   const pwd = $('#pwd').val();
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(email)) {
-    $('.invalid-feedback').css('display', 'block');
-    return;
-  }
   $.ajax({
     method: 'POST',
     url: '/sessions',
@@ -49,6 +49,7 @@ function connect(event) {
     error: () => {
       $('.alert_message').text('Incorrect email or password');
       $('.alert-danger').css('display', 'block');
+      setTimeout(() => $('.alert-danger').css('display', 'none'), 3000);
       console.log("Error:", 'Incorrect email or password');
     }
   });

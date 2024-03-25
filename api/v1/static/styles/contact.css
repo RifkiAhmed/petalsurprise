@@ -1,0 +1,17 @@
+input[type="text"],
+input[type="email"],
+#message,
+input[type="text"]:focus,
+input[type="email"]:focus,
+#message:focus {
+    background-color: rgba(0, 0, 0, 0.3);
+    color:#ffffff;
+    font-weight:lighter;
+}
+
+.btn-primary {
+    margin-right: 5px;
+    padding: 5px 25px;
+    background-color: #272640;
+    color: #ffffff;
+}

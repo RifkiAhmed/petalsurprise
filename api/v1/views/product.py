@@ -12,23 +12,13 @@ import os
 FORMAT = '%Y%m%d%H%M%S'
 PATH = 'api/v1/static/flowers'
 
-def _user_logged_in():
-    """ Checks if user is logged in or not
-    """
-    session_id = request.cookies('session_id')
-    if not session_id:
-        return False
-    user = AUTH.get_user_from_session_id(session_id=session_id)
-    if not user:
-        return False
-    return True
-
 
 @views.route("/products", methods=["POST"])
 def add_products() -> str:
     """ Add new Product object to the storage
     """
-    if not _user_logged_in():
+    user = AUTH.get_user_from_session_id(request.cookies.get('session_id'))
+    if not user or not user.is_admin:
         abort(401)
     name = request.form.get('name')
     price = request.form.get('price')
@@ -49,7 +39,8 @@ def add_products() -> str:
 def delete_product() -> str:
     """ Remove Product object from the storage
     """
-    if not _user_logged_in():
+    user = AUTH.get_user_from_session_id(request.cookies.get('session_id'))
+    if not user or not user.is_admin:
         abort(401)
     id = request.form.get('id')
     try:
@@ -64,7 +55,8 @@ def delete_product() -> str:
 def update_product() -> str:
     """ Update Product
     """
-    if not _user_logged_in():
+    user = AUTH.get_user_from_session_id(request.cookies.get('session_id'))
+    if not user or not user.is_admin:
         abort(401)
     id = request.form.get('id')
     name = request.form.get('name')

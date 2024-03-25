@@ -15,6 +15,7 @@
     <link rel="stylesheet" href="../static/styles/footer.css" />
     <link rel="stylesheet" href="../static/styles/dashboard.css" />
     <script src="../static/scripts/profile.js"></script>
+    <script src="../static/scripts/auth.js"></script>
     <script src="../static/scripts/orders.js"></script>
   </head>
 
@@ -55,9 +56,9 @@
           </div>
       </li>
     </ul>
-        <form action="#">
+        <form action="#" class="container" style="margin: 5px auto">
           <div class="row">
-            <div class="col-md-5">
+            <div class="col-md-5" style="background-color: rgba(169, 169, 169, 0.2)">
               <label for="status">Status:</label>
               <select class="form-control mb-2 mr-sm-2" id="status" name="status-list" onchange="orderStatus(event, 'none')">
                 <option>Default</option>
@@ -68,15 +69,15 @@
                 <option>Refunded</option>
               </select>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-3" style="background-color: rgba(169, 169, 169, 0.2);">
               <label for="status">From:</label>
               <input type="date" class="form-control" id="from" />
             </div>
-            <div class="col-md-3">
+            <div class="col-md-3" style="background-color: rgba(169, 169, 169, 0.2);">
               <label for="status">To:</label>
               <input type="date" class="form-control" id="to" />
             </div>
-            <div class="col-md-1">
+            <div class="col-md-1" style="background-color: rgba(169, 169, 169, 0.2);">
               <label for="status">&nbsp;</label>
               <button type="submit"  class="form-control btn-search" onclick="orderStatus(event, 'none')"><i class="fas fa-search"></i></button>
             </div>
