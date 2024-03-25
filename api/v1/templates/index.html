@@ -41,8 +41,8 @@
                 <a href="/auth"><i class="disconnected fa fa-user-circle fa-3x"></i></a>
             {% endif %}
                 <div class="dropdown-menu">
-                    <a class="dropdown-item" href="/profile"><i class="fa fa-user"> </i> Profile</a>
-                    <a class="dropdown-item" href="#" onclick="disconnect(event)"> <i class="fa fa-sign-out-alt"></i> Logout</a>
+                    <a class="dropdown-item" href="/profile"><i class="fa fa-user"></i> Profile</a>
+                    <a class="dropdown-item" href="#" onclick="disconnect(event)"><i class="fa fa-sign-out-alt"></i> Logout</a>
                 </div>
             </li>
         </ul>
@@ -61,7 +61,7 @@
                             <input type="text" class="form-control col-md-3" id="search" name="search-string" placeholder="Search..."/>
                             <button type="submit" class="btn btn-primary btn-search">Search</button>
                             <div class="form-group" id="filter-products">
-                                <select class="form-control col-md-12" id="select-filter-products" class="select-filter-products">
+                                <select class="form-control col-md-12" id="select-filter-products" class="select-filter-products" onchange="sortProducts(this)">
                                     <option>Recent Listing</option>
                                     <option>Price: Low to Heigh</option>
                                     <option>Price: High to Low</option>
@@ -86,7 +86,6 @@
                         <div class="products">
                             {% for product in products %}
                             <div class="item">
-                                <div>
                                     <div class="item_img">
                                         <div class="image-placeholder">
                                             <img src="../static/flowers/{{ product.img_path }}" width="100%"/>
@@ -99,14 +98,16 @@
                                                 Buy
                                             </div>
                                         </div>
-                                        <div class="admin_buttons row">
-                                            <div class="update_item col-sm-3" onclick='fillUpdateProductModal({{ product | tojson | safe }})'>
-                                                <i class="fa fa-sync fa-2x"></i>
+                                        {% if user.is_admin %}
+                                            <div class="admin_buttons row">
+                                                <div class="update_item col-sm-3" onclick='fillUpdateProductModal({{ product | tojson | safe }})'>
+                                                    <i class="fa fa-sync fa-2x"></i>
+                                                </div>
+                                                <div class="remove_item col-sm-3" onclick="deleteProduct({{ product.id }})">
+                                                    <i class="fa fa-times fa-2x"></i>
+                                                </div>
                                             </div>
-                                            <div class="remove_item col-sm-3" onclick="deleteProduct({{ product.id }})">
-                                                <i class="fa fa-times fa-2x"></i>
-                                            </div>
-                                        </div>
+                                        {% endif %}
                                     </div>
                                     <!-- flower name -->
                                     <div>
@@ -125,7 +126,6 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
                             {% endfor %}
                         </div>
                     </div>
@@ -137,16 +137,18 @@
                 <div class="cart" onclick="showCartItems()">
                     <i class="fa fa-shopping-cart fa-2x"></i>
                 </div>
-                <br />
-                <div class="cart" onclick="showAddItemsModal('add-new-item')">
-                    <i class="fa fa-plus fa-2x"></i>
-                </div>
-                <br />
-                <div class="cart">
-                    <a href="/dashboard">
-                        <i class="fa fa-list fa-2x"></i>
-                    </a>
-                </div>
+                {% if user.is_admin %}
+                    <br />
+                    <div class="cart" onclick="showAddItemsModal('add-new-item')">
+                        <i class="fa fa-plus fa-2x"></i>
+                    </div>
+                    <br />
+                    <div class="cart">
+                        <a href="/dashboard/overview">
+                            <i class="fa fa-list fa-2x"></i>
+                        </a>
+                    </div>
+                {% endif %}
                 <div>
                     <span id="badge" class="badge badge-light">0</span>
                 </div>
@@ -167,7 +169,7 @@
             {% endif %}
         </div>
 
-        {% if products|length <= 5 %}
+        {% if products|length == 0 %}
             <footer>2024</footer>
         {% else %}
             <footer class="relative">2024</footer>
