@@ -10,6 +10,8 @@
     font-family:'Arial Narrow Bold'
 }
 
-.fa-github {
+.fa-github,
+.fa-linkedin {
     font-size:xx-large;
+    margin: 0 3px;
 }
