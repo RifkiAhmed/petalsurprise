@@ -38,7 +38,6 @@ function connect(event) {
   event.preventDefault();
   const email = $('#email').val();
   const pwd = $('#pwd').val();
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   $.ajax({
     method: 'POST',
     url: '/sessions',
@@ -47,7 +46,7 @@ function connect(event) {
       window.location.href = '/';
     },
     error: () => {
-      $('.alert_message').text('Incorrect email or password');
+      $('.alert_message').text('Invalid email, username, or password');
       $('.alert-danger').css('display', 'block');
       setTimeout(() => $('.alert-danger').css('display', 'none'), 3000);
       console.log("Error:", 'Incorrect email or password');
@@ -79,12 +78,16 @@ function signUp() {
   const link = $('.sign-up');
   if (link.text() === 'Sign In') {
     link.text('Sign Up');
+    $('#username-label').text('Email or username:')
+    $('#email').attr('placeholder', 'Email or username');
     $('.confirm-pwd').css('display', 'none');
     $('.user-account').text('Sign up for an account');
     $('.login-header').text('Sign In');
     $('.btn-connect').css('display', 'block');
   } else {
     link.text('Sign In');
+    $('#username-label').text('Email:')
+    $('#email').attr('placeholder', 'Email');
     $('.confirm-pwd').css('display', 'block');
     $('.user-account').text('Sign in to an existing account');
     $('.login-header').text('Sign Up');
