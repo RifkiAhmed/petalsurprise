@@ -48,8 +48,8 @@ def create_checkout_session():
             'products': ', '.join(map(str, ids))}
         },
         mode='payment',
-        success_url='http://localhost:5000',
-        cancel_url='http://localhost:5000',
+        success_url='https://petalsurprise.store',
+        cancel_url='https://petalsurprise.store',
     )
     return jsonify({'sessionId': session.id})
 
