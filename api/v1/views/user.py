@@ -25,13 +25,19 @@ def users() -> str:
 def login() -> str:
     """User login
     """
-    email = request.form.get("email")
+    username = request.form.get("email")
     password = request.form.get("password")
-    valid_lagin = AUTH.valid_login(email, password)
+    valid_lagin = AUTH.valid_login(password, email=username)
+    session_id = None
     if not valid_lagin:
-        abort(401)
-    session_id = AUTH.create_session(email)
-    response = jsonify({"email": email, "message": "logged in"})
+        valid_lagin = AUTH.valid_login(password, username=username)
+        if not valid_lagin:
+            abort(401)
+        else:
+            session_id = AUTH.create_session(username=username)
+    else:
+        session_id = AUTH.create_session(email=username)
+    response = jsonify({"email": username, "message": "logged in"})
     response.set_cookie("session_id", session_id)
     return response
 
@@ -79,7 +85,7 @@ def update_profile() -> str:
             storage.update(user, email=email)
             return jsonify({"message": "Email updated"}), 200
         if new_password:
-            if not AUTH.valid_login(user.email, current_password):
+            if not AUTH.valid_login(current_password, email=user.email):
                 abort(401)
             AUTH.update_password(user, new_password=new_password)
             return jsonify({"message": "Password updated"}), 200
