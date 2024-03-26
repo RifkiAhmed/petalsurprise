@@ -97,7 +97,7 @@ def send_email(subject, message, sender=None, receiver=None, order=None):
                         <h3>Order Details:</h3>
                         <h4> - Recipient's name: { order.recipient_name }</h4>
                         <h4> - Delivery Address: { order.recipient_address }</h4>
-                        <h4> - Message sent: { order.recipient_address }</h4>
+                        <h4> - Message sent: { order.message }</h4>
                         <h4> - { flowers }</h4>
                         <br>
                         <br>
