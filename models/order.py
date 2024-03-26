@@ -19,6 +19,7 @@ class Order(BaseModel, Base):
     """
     __tablename__ = "orders"
     user_id = Column(Integer, ForeignKey('users.id'), nullable=True)
+    user_email = Column(String(250), nullable=False)
     recipient_name = Column(String(250), nullable=False)
     recipient_address = Column(String(250), nullable=False)
     message = Column(String(250), nullable=True)
