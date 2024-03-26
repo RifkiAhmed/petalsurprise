@@ -1,10 +1,17 @@
 const stripe = Stripe('pk_test_51OsCjcRoWq4O3O1iVOgvSSwgvhUGeMjnlC1FttsEeCbpptE1dUoGORd1D35ciVEQPaQbljUA9nZXhQMpf6favtky00IRNCXihG');
 let cart = [];
+let products = [];
 
 $(document).ready(function() {
   const $badge = $('#badge');
   $badge.html(cart.length);
 });
+
+function checkoutRemoveBorders() {
+  $('#sender-email').css('border', '0px');
+  $('#recipient-name').css('border', '0px');
+  $('#recipient-address').css('border', '0px');
+}
 
 function addToCart(product) {
   $('.list-items').eq(0).css('visibility', 'hidden');
@@ -25,16 +32,15 @@ function addToCart(product) {
   } catch (err) {
     console.error(err.message);
   }
-  console.log('Updated cart:', cart);
 }
 
 async function showCartItems(product) {
   const $listOfItems = $('#list-items');
-  const $table = $('<table class="table" style="background-color: #272640; color: #ffffff"></table>');
+  const $table = $('<table class="table" style="background-color: rgba(0, 0, 0, 0.3); color: #ffffff"></table>');
   $table.append('<thead><tr><th></th><th>Flower</th><th>Price</th></tr></thead>');
 
   $listOfItems.empty();
-  const products = product ? [product] : cart;
+  products = product ? [product] : cart;
 
   let $itemsContent = products.length > 0
     ? products.map((item, i) => `
@@ -49,11 +55,16 @@ async function showCartItems(product) {
     : 'Empty';
   
   const totalPrice = await products.reduce((total, item) => total + parseInt(item.price), 0);
-  $itemsContent += `<tr><td colspan="2"><h4>Total :</h4></td><td><h4>$${totalPrice}</h4></td></tr>`
+  $itemsContent += `<tr><td colspan="2"><h5>Total :</h5></td><td><h5>$${totalPrice}</h5></td></tr>`
   $itemsContent = `<tbody>${$itemsContent}</tbody>`
 
   $table.append($itemsContent);
   $listOfItems.append($table);
+  checkoutRemoveBorders();
+  $('#sender-email').val('');
+  $('#recipient-name').val('');
+  $('#recipient-address').val('');
+  $('#sender-message').val('');
   $('.list-items').eq(0).css('visibility', 'visible');
 }
 
@@ -61,20 +72,39 @@ function showAddItemsModal(className) {
   $(`.${className}`).eq(0).css('visibility', 'visible');
 }
 
-function checkout() {
+function checkout(id) {
+  checkoutRemoveBorders();
+  const sender_email = $('#sender-email').val();
   const recipient_name = $('#recipient-name').val();
   const recipient_address = $('#recipient-address').val();
   const message = $('#sender-message').val();
 
-  if (cart.length === 0) return;
+  if (products.length === 0) return;
+  if (sender_email === '' && id == null) {
+    $('#sender-email').css('border', '2px solid red');
+    $('#sender-email').focus();
+    return;
+  }
+
+  if (sender_email === '' && id == null) {
+    $('#sender-email').css('border', '2px solid red');
+    $('#sender-email').focus();
+    return;
+  }
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(sender_email)) {
+    $('#sender-email').css('border', '2px solid red');
+    $('#sender-email').focus();
+    return;
+  }
   if (recipient_name === '') {
-    $('#name').css('border', '2px solid red');
-    $('#address').css('border', '0px');
+    $('#recipient-name').css('border', '2px solid red');
+    $('#recipient-name').focus();
     return;
   }
   if (recipient_address === '') {
-    $('#name').css('border', '0px');
-    $('#address').css('border', '2px solid red');
+    $('#recipient-address').css('border', '2px solid red');
+    $('#recipient-address').focus();
     return;
   }
   fetch('/create-checkout-session', {
@@ -82,31 +112,7 @@ function checkout() {
     headers: {
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({ cart, recipient_name, recipient_address, message })
-  })
-  .then(function(response) {
-    return response.json();
-  })
-  .then(function(session) {
-    return stripe.redirectToCheckout({ sessionId: session.sessionId });
-  })
-  .then(function(result) {
-    if (result.error) {
-      console.error(result.error.message);
-    }
-  })
-  .catch(function(error) {
-    console.error('Error:', error);
-  });
-};
-
-function buy(id) {
-  fetch('/create-checkout-session', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({ cart: [{id: id, name: "Buy 1", price: 10000}] })
+    body: JSON.stringify({ cart: products, sender_email, recipient_name, recipient_address, message })
   })
   .then(function(response) {
     return response.json();
@@ -128,6 +134,47 @@ function showFilters() {
   $('.filters').toggle();
 }
 
+function searchWithName(event) {
+  event.preventDefault();
+  $('#search').css('border', '0px');
+  let searchString = $('#search').val();
+
+  if (searchString === '') {
+    $('#search').css('border', '2px solid red');
+    return;
+  };
+  $.ajax({
+    method: 'POST',
+    url: '/search',
+    data: { 'search-string': searchString },
+    success: (response) => { 
+      displayProducts(response.products, response.user);
+    },
+    error: (error) => { console.log(`Error: ${error}`); }
+  });
+}
+
+
+function productsWithinRange(event) {
+  event.preventDefault();
+  $('#min-price').css('border', '0px');
+  $('#max_price').css('border', '0px');
+  let min_price = $('#min-price').val();
+  let max_price = $('#max-price').val();
+
+  if (min_price === '' && max_price === '') {
+    return;
+  };
+  $.ajax({
+    method: 'POST',
+    url: '/range',
+    data: { min_price, max_price },
+    success: (response) => { 
+      displayProducts(response.products, response.user);
+    },
+    error: (error) => { console.log(`Error: ${error}`); }
+  });
+}
 
 function sortProducts(element) {
   const selectedIndex = $(element).find('option:selected').index();
@@ -136,14 +183,13 @@ function sortProducts(element) {
     method: 'GET',
     url: `/index/products/${values[selectedIndex]}`,
     success: (response) => { 
-      displayProducts(response.products, response.page, response.user);
+      displayProducts(response.products, response.user);
     },
     error: (error) => { console.log(`Error: ${error}`); }
   });
 }
 
-
-function displayProducts(products, page, user) {
+function displayProducts(products, user) {
   $('.products').empty();
   const productsItems = products.map(product => {
     let btn_admin = '';

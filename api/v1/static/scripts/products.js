@@ -1,18 +1,22 @@
-function removeWarning() {
+function removeBorders() {
   $("#flower-name").css('border', '0px');
   $("#flower-price").css('border', '0px');
   $(".custom-file").css('outline', '0px');
+  $("#product-new-name").css('border', '0px');
+  $("#product-new-price").css('border', '0px');
 }
 
 function addProducts(event) {
   event.preventDefault();
-  removeWarning();
+  removeBorders();
   const name = $("#flower-name").val();
   const price = $("#flower-price").val();
+  const description = $("#flower-description").val();
   const path = $("#customFile")[0].files[0];
   const formData = new FormData();
   formData.append("name", name);
   formData.append("price", price);
+  formData.append("description", description);
   formData.append("image", path);
 
   if (name === '') {
@@ -37,7 +41,10 @@ function addProducts(event) {
       window.location.href = '/';
     },
     error: (error) => {
-      console.log(error.message);
+      $('.alert_message').text(error.responseJSON.error);
+      $('.alert-danger').css('display', 'block');
+      setTimeout(() => $('.alert-danger').css('display', 'none'), 3000);
+      console.log("Error:", error.responseJSON.message);
     },
   });
 }
@@ -58,8 +65,9 @@ function deleteProduct(id) {
 
 function fillUpdateProductModal(product) {
   $('#product-name-id').text(`${product.name} #${product.id}`);
-  $('#product-new-name').val(product.name).prop('disabled', true);
-  $('#product-new-price').val(product.price).prop('disabled', true);
+  $('#product-new-name').val(product.name);
+  $('#product-new-price').val(product.price);
+  $('#product-new-description').val(product.description);
   $('#product-image').attr('src', `../static/flowers/${product.img_path}`).css({
     'width': '305px',
     'height': '305px',
@@ -71,13 +79,26 @@ function fillUpdateProductModal(product) {
 
 function submitUpdateProduct(event, id) {
   event.preventDefault();
+  removeBorders();
   const name = $("#product-new-name").val();
   const price = $("#product-new-price").val();
+  const description = $("#product-new-description").val();
   const path = $("#newCustomFile")[0].files[0];
+
+  if (name === '') {
+    $("#product-new-name").css('border', '2px solid red');
+    return;
+  }
+  if (price === '') {
+    $("#product-new-price").css('border', '2px solid red');
+    return;
+  }
+
   const formData = new FormData();
   formData.append("id", id);
   formData.append("name", name);
   formData.append("price", price);
+  formData.append("description", description);
   formData.append("image", path);
 
   $.ajax({
@@ -90,7 +111,10 @@ function submitUpdateProduct(event, id) {
       window.location.href = '/';
     },
     error: (error) => {
-      console.log(error.message);
+      $('.alert_message').text(error.responseJSON.message);
+      $('.alert-danger').css('display', 'block');
+      setTimeout(() => $('.alert-danger').css('display', 'none'), 3000);
+      console.log("Error:", error.responseJSON.message);
     },
   });
 }

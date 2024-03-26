@@ -4,6 +4,7 @@ footer {
     width: 100%; 
     border-top: 3px solid;
     border-image: radial-gradient(circle at top, #427aa1, #ebf2fa);
+    background-color: #14213d;;
     border-image-slice: 1;
     text-align: center;
     padding: 20px;

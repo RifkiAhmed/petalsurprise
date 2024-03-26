@@ -37,22 +37,22 @@ class Auth:
             return storage.add(user)
         raise ValueError(f"User {email} already exists")
 
-    def valid_login(self, email: str, password: str) -> bool:
+    def valid_login(self, password: str, **kwargs) -> bool:
         """Checks user's credentials
         """
         try:
-            user = storage.find_by(User, email=email)
+            user = storage.find_by(User, **kwargs)
             return bcrypt.checkpw(
                 password.encode("utf-8"),
                 user.hashed_password.encode("utf-8"))
         except NoResultFound:
             return False
 
-    def create_session(self, email: str) -> str:
+    def create_session(self, **kwargs) -> str:
         """Creates and returns user's session id
         """
         try:
-            user = storage.find_by(User, email=email)
+            user = storage.find_by(User, **kwargs)
             session_id = _generate_uuid()
             storage.update(user, session_id=session_id)
             return session_id
@@ -84,7 +84,8 @@ class Auth:
                 '/user_orders']}
         session_id = request.cookies.get('session_id')
         if not session_id:
-            if request.path in paths['admin'] or request.path in paths['users']:
+            if (request.path in paths['admin']) \
+                    or (request.path in paths['users']):
                 return True
 
     def update_password(self, user, new_password: str) -> None:

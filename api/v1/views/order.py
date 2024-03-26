@@ -142,6 +142,7 @@ def orders() -> str:
 def update_order() -> str:
     """ Update order status
     """
+    from api.v1 import send_email
     user = AUTH.get_user_from_session_id(request.cookies.get('session_id'))
     if not user or not user.is_admin:
         abort(403)
@@ -150,4 +151,11 @@ def update_order() -> str:
     order = storage.find_by(Order, id=id)
     if order:
         storage.update(order, status=status)
+    if status == 'Delivered':
+        send_email(
+            subject="Order delivered",
+            message="",
+            sender=None,
+            receiver=order.user_email,
+            order=order)
     return jsonify({})

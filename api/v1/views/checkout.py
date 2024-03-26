@@ -18,6 +18,7 @@ def create_checkout_session():
     user = AUTH.get_user_from_session_id(request.cookies.get('session_id'))
     data = request.get_json()
     cart = data.get('cart', [])
+    sender_email = data.get('sender_email')
     recipient_name = data.get('recipient_name')
     recipient_address = data.get('recipient_address')
     message = data.get('message', '')
@@ -40,15 +41,15 @@ def create_checkout_session():
         line_items=list_items,
         payment_intent_data={'metadata': {
             'user_id': str(user.id) if user else None,
-            'user_email': user.email,
+            'user_email': user.email if user else sender_email,
             'recipient_name': recipient_name,
             'recipient_address': recipient_address,
             'message': message,
             'products': ', '.join(map(str, ids))}
         },
         mode='payment',
-        success_url='http://localhost:5000?success',
-        cancel_url='http://localhost:5000?cancel',
+        success_url='http://localhost:5000',
+        cancel_url='http://localhost:5000',
     )
     return jsonify({'sessionId': session.id})
 
@@ -77,12 +78,14 @@ def stripe_webhook():
         currency = payment_intent.get('currency')
         payment_metadata = payment_intent.get('metadata', {})
         user_id = payment_metadata.get('user_id')
+        user_email = payment_metadata.get('user_email')
         recipient_name = payment_metadata.get('recipient_name')
         recipient_address = payment_metadata.get('recipient_address')
         message = payment_metadata.get('message')
         products_ids = payment_metadata.get('products').split(', ')
 
-        order = Order(user_id=user_id, recipient_name=recipient_name,
+        order = Order(user_id=user_id, user_email=user_email,
+                      recipient_name=recipient_name,
                       recipient_address=recipient_address, message=message,
                       payment_method_type=payment_method_type, amount=amount,
                       currency=currency, charge_id=charge_id)

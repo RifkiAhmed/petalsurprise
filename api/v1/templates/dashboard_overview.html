@@ -12,7 +12,7 @@
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"/>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"/>
         <link rel="stylesheet" href="../static/styles/nav.css" />
-        <link rel="stylesheet" href="../static/styles/common.css" />
+
         <link rel="stylesheet" href="../static/styles/footer.css" />
         <link rel="stylesheet" href="../static/styles/dashboard.css" />
         <script src="../static/scripts/profile.js"></script>
@@ -36,7 +36,7 @@
                         <li class="list-group-item"> Orders Management </li>
                     </a>
                 </ul>
-                <div class="footer"> 2024 </div>
+                <div class="footer"> © 2024 PetalSurprise. All Rights Reserved. </div>
             </div>
 
             <div class="col-sm-2">
@@ -100,8 +100,8 @@
                 let totalAmount = 0;
                 json_data.forEach(function(item) {
                     if (item['date'] === date.toISOString().slice(0, 10)) {
-                        count = item['count'];
-                        totalAmount = item['total_amount'];
+                        count = Math.max(0, item['count']);
+                        totalAmount = Math.max(0, item['total_amount']);
                     }
                 });
                 counts.push(count);
