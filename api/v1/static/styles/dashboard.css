@@ -1,3 +1,8 @@
+body {
+  background-color: #14213d;
+  padding: 0px;
+}
+
 /* Plus column */
 th:nth-child(1) {
   width: 1%;
