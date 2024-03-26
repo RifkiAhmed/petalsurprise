@@ -5,6 +5,7 @@ DB model
 from models.basemodel import Base
 from sqlalchemy import create_engine, and_, func
 from sqlalchemy.orm import sessionmaker, scoped_session
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.orm.session import Session
 from os import getenv
@@ -67,18 +68,21 @@ class DB:
     def get_limit(self, cls, page, per_page, sort_by=None):
         """ Returns the objects corresponding to the page of size per_page
         """
-        start = page * per_page
-        end = start + per_page
-        products_count = self.count(cls)
-        if end > products_count:
-            end = products_count
         products = self._session.query(cls)
         if sort_by:
+            if sort_by == 'recent_listing' or sort_by == 'index':
+                products = products.order_by(cls.id.desc())
             if sort_by == 'low_to_hight':
                 products = products.order_by(getattr(cls, 'price'))
             if sort_by == 'high_to_low':
                 products = products.order_by(getattr(cls, 'price').desc())
-        products = products.slice(start, end).all()
+        if not sort_by or sort_by == 'index':
+            start = page * per_page
+            end = start + per_page
+            products_count = self.count(cls)
+            if end > products_count:
+                end = products_count
+            products = products.slice(start, end).all()
         return products
 
     def get_range_filter(self, cls, min_price, max_price):
@@ -134,13 +138,16 @@ class DB:
     def update(self, obj, **kwargs) -> None:
         """ Updates object attributes with the given key-value pairs
         """
-        if obj:
-            for key, value in kwargs.items():
-                if key in obj.__dict__:
-                    setattr(obj, key, value)
-                else:
-                    raise ValueError
-            self._session.commit()
+        try:
+            if obj:
+                for key, value in kwargs.items():
+                    if key in obj.__dict__:
+                        setattr(obj, key, value)
+                    else:
+                        raise ValueError
+                self._session.commit()
+        except IntegrityError:
+            raise ValueError
         return None
 
     def count(self, cls):
