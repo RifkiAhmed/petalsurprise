@@ -16,13 +16,13 @@ def index():
     current_page = request.args.get('page', 1, type=int)
     products = []
     products = storage.get_limit(
-        Product, current_page - 1, os.getenv('PER_PAGE'), 'recent_listing')
+        Product, current_page - 1, int(os.getenv('PER_PAGE')), 'index')
     serialized_products = [p.to_dict() for p in products]
     size = storage.count(Product)
     page = {'has_prev': True, 'has_next': True, 'num': current_page}
     if current_page == 1:
         page['has_prev'] = False
-    if (current_page * os.getenv('PER_PAGE')) >= size:
+    if (current_page * int(os.getenv('PER_PAGE'))) >= size:
         page['has_next'] = False
     return render_template('index.html', user=user,
                            products=serialized_products, page=page)
@@ -31,20 +31,22 @@ def index():
 @views.route('/range', methods=['GET', 'POST'])
 def range():
     """Return index page"""
+    print('hhhh')
     user = AUTH.get_user_from_session_id(request.cookies.get('session_id'))
-    min_price = request.form.get('min-price', type=float)
-    max_price = request.form.get('max-price', type=float)
+    min_price = request.form.get('min_price', type=float)
+    max_price = request.form.get('max_price', type=float)
+    print(min_price)
     products = []
     if not min_price and not max_price:
+        print('redirect')
         return redirect(url_for('views.index'))
     products = storage.get_range_filter(Product, min_price, max_price)
     serialized_products = [p.to_dict() for p in products]
     page = {'has_prev': False, 'has_next': False, 'num': 1}
-    return render_template(
-        'index.html',
-        user=user,
-        products=serialized_products,
-        page=page)
+    return {
+        "products": serialized_products,
+        "page": page,
+        "user": user.to_dict()}
 
 
 @views.route('/search', methods=['GET', 'POST'])
