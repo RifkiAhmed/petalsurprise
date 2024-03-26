@@ -57,11 +57,10 @@ def string_search():
     products = storage.get_string_filter(Product, search_with_name)
     serialized_products = [p.to_dict() for p in products]
     page = {'has_prev': False, 'has_next': False, 'num': 1}
-    return render_template(
-        'index.html',
-        user=user,
-        products=serialized_products,
-        page=page)
+    return {
+        "products": serialized_products,
+        "page": page,
+        "user": user.to_dict()}
 
 
 @views.route('/index/products/<sort_by>', methods=['GET'])
