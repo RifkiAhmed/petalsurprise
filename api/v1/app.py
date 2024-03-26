@@ -21,22 +21,28 @@ async def before_request():
 
 
 @app.errorhandler(401)
+def unauthorized(_):
+    """ Unauthorized error handler
+    """
+    return jsonify({"error": "Unauthorized"}), 401
+
+
 @app.errorhandler(403)
-def unauthorized(error) -> str:
-    """ Redirect user to the home page for Unauthorized and Forbidden access
+def forbidden(_) -> str:
+    """ Redirect user to the home page when Forbidden error
     """
     return redirect(url_for('views.index'))
 
 
 @app.errorhandler(404)
-def not_found(error) -> str:
+def not_found(_) -> str:
     """ Not found handler
     """
     return jsonify({"error": "Not found"}), 404
 
 
 @app.teardown_appcontext
-def teardown(exception=None):
+def teardown(_):
     storage.close()
 
 
