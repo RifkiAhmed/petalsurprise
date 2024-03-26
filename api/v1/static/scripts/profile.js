@@ -55,13 +55,18 @@ function updateProfile(prop) {
     method: 'PUT',
     data,
     success: (response) => {
+      window.location.href = '/profile';
       $('.alert-info').css('display', 'block');
       $('.alert-info').html(`<strong> ${response.message} successfully </strong>`);
       setInterval(() =>  $('.alert-info').css('display', 'none'), 3000);
     },
-    error: () =>{
+    error: (error) => {
       $('.alert-danger').css('display', 'block');
-      $('.alert_message').html('<strong> Password error </strong>');
+      if (prop === 'username') {
+        $('.alert_message').html('<strong> Username already registred </strong>');
+      } else if (prop === 'email') {
+        $('.alert_message').html('<strong> Email already registred </strong>');
+      } else $('.alert_message').html('<strong> Invalid password </strong>');
       setInterval(() =>  $('.alert-danger').css('display', 'none'), 3000);
     }
   });
