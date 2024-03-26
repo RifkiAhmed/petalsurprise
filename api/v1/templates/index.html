@@ -20,6 +20,9 @@
     </head>
 
     <body>
+        <div class="alert alert-danger">
+            <h6 class="alert_message"> <!-- Message to show --></h6>
+        </div>
         <!-- Navigation bar -->
         <ul class="nav nav-pills">
             <li class="nav-item">
@@ -56,7 +59,7 @@
                         <h4>Surprise your loved ones with the gift of flowers!</h4>
                     </div>
                     <div>
-                        <form class="form-inline" id="searchForm" action="/" method="POST">
+                        <form class="form-inline" id="searchForm" action="/search" method="POST">
                             <i class="fas fa-filter" onclick="showFilters()"></i>
                             <input type="text" class="form-control col-md-3" id="search" name="search-string" placeholder="Search..."/>
                             <button type="submit" class="btn btn-primary btn-search">Search</button>
@@ -72,14 +75,14 @@
                     <div class="items_list">
                         <div class="filters">                            
                             <div>
-                                <form class="form" action="/" method="POST">
+                                <form class="form" action="#" method="POST">
                                     <label for="min-price">Min price:</label>
                                     <input type="text" class="form-control col-md-12" id="min-price" name="min-price" placeholder="Min price"/>
                                     <br>
                                     <label for="max-price">Max price:</label>
                                     <input type="text" class="form-control col-md-12" id="max-price" name="max-price" placeholder="Max price"/>
                                     <br>
-                                    <button type="submit" class="btn btn-primary btn-range-price"> Search </button>
+                                    <button class="btn btn-primary" onclick="productsWithinRange(event)"> Search </button>
                                 </form>
                             </div>
                         </div>
@@ -115,7 +118,11 @@
                                         <span><h5>{{ product.name }}</h5></span>
                                         <!-- flower description -->
                                         <div>
-                                            <h6>9 flowers</h6>
+                                            {% if (product.description) %}
+                                                <h6>{{ product.description }}</h6>
+                                            {% else %}
+                                                <h6>&nbsp;</h6>
+                                            {% endif %}
                                         </div>
                                     </div>
                                     <!-- flower price -->
@@ -134,26 +141,26 @@
 
             <div class="right_content col-sm-1">
                 <div class="shopping">
-                <div class="cart" onclick="showCartItems()">
-                    <i class="fa fa-shopping-cart fa-2x"></i>
-                </div>
-                {% if user.is_admin %}
-                    <br />
-                    <div class="cart" onclick="showAddItemsModal('add-new-item')">
-                        <i class="fa fa-plus fa-2x"></i>
+                    <div class="cart" onclick="showCartItems()">
+                        <i class="fa fa-shopping-cart fa-2x"></i>
                     </div>
-                    <br />
-                    <div class="cart">
-                        <a href="/dashboard/overview">
-                            <i class="fa fa-list fa-2x"></i>
-                        </a>
+                    {% if user.is_admin %}
+                        <br />
+                        <div class="cart" onclick="showAddItemsModal('add-new-item')">
+                            <i class="fa fa-plus fa-2x"></i>
+                        </div>
+                        <br />
+                        <div class="cart">
+                            <a href="/dashboard/overview">
+                                <i class="fa fa-list fa-2x"></i>
+                            </a>
+                        </div>
+                    {% endif %}
+                    <div>
+                        <span id="badge" class="badge badge-light">0</span>
                     </div>
-                {% endif %}
-                <div>
-                    <span id="badge" class="badge badge-light">0</span>
                 </div>
             </div>
-        </div>
         </div>
         <div class="pagination justify-content-center">
             {% if page['has_prev'] %}
@@ -168,11 +175,12 @@
                 <a class="circular disabled" href="">&gt;</a>
             {% endif %}
         </div>
-
+        <div class="pagination2 justify-content-center">
+        </div>
         {% if products|length == 0 %}
-            <footer>2024</footer>
+            <footer>© 2024 PetalSurprise. All Rights Reserved.</footer>
         {% else %}
-            <footer class="relative">2024</footer>
+            <footer class="relative">© 2024 PetalSurprise. All Rights Reserved.</footer>
         {% endif %}
 
         <!-- Cart Summary -->
@@ -185,7 +193,6 @@
                 <hr />
                 <div id="list-items"></div>
                     <br />
-                    <hr />
                     <h5 style="text-align: center">Sender and Recipient Details</h5>
                     <hr />
                     <form action="#">
@@ -208,7 +215,7 @@
                             <textarea class="form-control" maxlength="249" rows="5" id="sender-message" name="sender-message"></textarea>
                         </div>
                     </form>
-                    <button class="btn btn-primary" onclick="checkout()">Checkout</button>
+                    <button class="btn btn-primary" onclick="checkout({{ user.id }})">Checkout</button>
                 </div>
             </div>
         </div>
@@ -230,8 +237,12 @@
                         <input type="text" class="form-control" id="flower-price" placeholder="$" name="flower-price"/>
                     </div>
                     <div class="form-group">
+                        <label for="flower-description">Description:</label>
+                        <input type="text" class="form-control" id="flower-description" placeholder="Flower description" name="flower-description"/>
+                    </div>
+                    <div class="form-group">
                         <label for="customFile">Add image (.jpg, .png):</label>
-                    <div class="custom-file mb-3">
+                        <div class="custom-file mb-3">
                             <input type="file" accept=".jpg, .png" class="custom-file-input" id="customFile" name="filename"/>
                             <label class="custom-file-label" for="customFile">Choose file</label>
                         </div>
@@ -256,38 +267,36 @@
                     </div>
                     <!-- Modal body -->
                     <div class="modal-body">
-                    <div class="container item">
+                    <div class="container update-item">
                             <form action="/products" method="PUT">
-                            <div class="form-group product-image">
+                                <div class="form-group product-image">
                                     <img id="product-image" src="" />
                                     <h4 id="product-name-id"></h4>
                                 </div>
                                 <label for="product-new-name">Name:</label>
-                            <div class="form-group form-inline">
-                                    <input type="text" class="form-control" id="product-new-name" name="product-new-name" disabled style="width: 365px"/>
-                                    <i class="fa fa-pen" onclick="$('#product-new-name').prop('disabled', false);"></i>
+                                <div class="form-group form-inline">
+                                    <input type="text" class="form-control" id="product-new-name" name="product-new-name" style="width: 365px"/>
                                 </div>
                                 <label for="product-new-price">Price:</label>
-                            <div class="form-group form-inline">
-                                    <input type="text" class="form-control" id="product-new-price" name="product-new-price" disabled/>
-                                    <i class="fa fa-pen" onclick="$('#product-new-price').prop('disabled', false);"></i>
+                                <div class="form-group form-inline">
+                                    <input type="text" class="form-control" id="product-new-price" name="product-new-price"/>
                                 </div>
-                            <div class="form-group">
+                                <div class="form-group">
+                                    <label for="product-new-description">Description:</label>
+                                    <input type="text" class="form-control" id="product-new-description" placeholder="Flower description" name="product-new-description"/>
+                                </div>
+                                <div class="form-group">
                                     <label for="customFile">Add image (.jpg, .png):</label>
-                                <div class="custom-file mb-3">
+                                    <div class="custom-file mb-3">
                                         <input type="file" accept=".jpg, .png" class="custom-file-input" id="newCustomFile" name="filename"/>
                                         <label class="custom-file-label" for="customFile">Choose file</label>
                                     </div>
                                 </div>
-                            <div class="form-group">
+                                <div class="form-group">
                                     <button type="submit" id="submit-update-product" class="btn btn-primary"> Update </button>
                                 </div>
                             </form>
                         </div>
-                    </div>
-                    <!-- Modal footer -->
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-outline-secondary" data-dismiss="modal"> Close </button>
                     </div>
                 </div>
             </div>
