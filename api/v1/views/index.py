@@ -8,8 +8,6 @@ from models import storage, AUTH
 from models.product import Product
 import os
 
-PER_PAGE = 4
-
 
 @views.route('/', methods=['GET', 'POST'])
 def index():
@@ -18,13 +16,13 @@ def index():
     current_page = request.args.get('page', 1, type=int)
     products = []
     products = storage.get_limit(
-        Product, current_page - 1, PER_PAGE, 'recent_listing')
+        Product, current_page - 1, os.getenv('PER_PAGE'), 'recent_listing')
     serialized_products = [p.to_dict() for p in products]
     size = storage.count(Product)
     page = {'has_prev': True, 'has_next': True, 'num': current_page}
     if current_page == 1:
         page['has_prev'] = False
-    if (current_page * PER_PAGE) >= size:
+    if (current_page * os.getenv('PER_PAGE')) >= size:
         page['has_next'] = False
     return render_template('index.html', user=user,
                            products=serialized_products, page=page)
