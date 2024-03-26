@@ -40,10 +40,11 @@ def range():
     products = storage.get_range_filter(Product, min_price, max_price)
     serialized_products = [p.to_dict() for p in products]
     page = {'has_prev': False, 'has_next': False, 'num': 1}
+    user = user.to_dict() if user else None
     return {
         "products": serialized_products,
         "page": page,
-        "user": user.to_dict()}
+        "user": user}
 
 
 @views.route('/search', methods=['GET', 'POST'])
@@ -57,10 +58,11 @@ def string_search():
     products = storage.get_string_filter(Product, search_with_name)
     serialized_products = [p.to_dict() for p in products]
     page = {'has_prev': False, 'has_next': False, 'num': 1}
+    user = user.to_dict() if user else None
     return {
         "products": serialized_products,
         "page": page,
-        "user": user.to_dict()}
+        "user": user}
 
 
 @views.route('/index/products/<sort_by>', methods=['GET'])
@@ -75,10 +77,11 @@ def products_sorted(sort_by):
         sort_by=sort_by)
     serialized_products = [p.to_dict() for p in products]
     page = {'has_prev': False, 'has_next': False, 'num': 1}
+    user = user.to_dict() if user else None
     return {
         "products": serialized_products,
         "page": page,
-        "user": user.to_dict()}
+        "user": user}
 
 
 @views.route('/contact', methods=["GET"])
