@@ -31,14 +31,11 @@ def index():
 @views.route('/range', methods=['GET', 'POST'])
 def range():
     """Return index page"""
-    print('hhhh')
     user = AUTH.get_user_from_session_id(request.cookies.get('session_id'))
     min_price = request.form.get('min_price', type=float)
     max_price = request.form.get('max_price', type=float)
-    print(min_price)
     products = []
     if not min_price and not max_price:
-        print('redirect')
         return redirect(url_for('views.index'))
     products = storage.get_range_filter(Product, min_price, max_price)
     serialized_products = [p.to_dict() for p in products]
