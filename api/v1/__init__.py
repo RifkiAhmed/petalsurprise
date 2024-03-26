@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """
+Send email function
 """
 from datetime import datetime
 from email.message import EmailMessage
@@ -9,7 +10,7 @@ import ssl
 
 
 def send_email(subject, message, sender=None, receiver=None, order=None):
-    """Sends emails
+    """Sends and receive emails to and from sustomers
     """
     USER_MAIL = os.getenv('USER_MAIL')
     USER_PWD = os.getenv('USER_PWD')
@@ -23,8 +24,11 @@ def send_email(subject, message, sender=None, receiver=None, order=None):
         <head>
             <style>
                 .content {{
-                    background-color: rgba(39, 38, 64, 0.7);
-                    padding: 50px 0px;
+                    background-color: #14213d;;
+                    padding: 50px 20px;
+                    max-width: 900px;
+                    margin: auto;
+                    
                 }}
                 
                 img {{
@@ -34,7 +38,8 @@ def send_email(subject, message, sender=None, receiver=None, order=None):
                 }}
                 
                 .header, .message {{
-                    background-color: rgba(255, 255, 255, 0.4);
+                    background-color: rgba(109, 89, 122, 0.4);
+                    color: #ffffff;
                     max-width: 700px;
                     padding:10px 15px;
                     border-radius: 8px;
@@ -45,7 +50,11 @@ def send_email(subject, message, sender=None, receiver=None, order=None):
                     margin: 0px auto 50px;
                 }}
                 
-                a {{
+                h3, h4, h3#customer_email {{
+                    color: #ffffff;
+                }}
+                
+                a#website_url {{
                     display: block;
                     text-align: center;
                     font-size: 18px;
@@ -61,14 +70,14 @@ def send_email(subject, message, sender=None, receiver=None, order=None):
                 <div class="content" >
                     <img src="{ os.getenv('BRAND') }">
                     <div class="header">
-                        <h3>From: { sender }</h3>
+                        <h3 id="customer_email">From: { sender }</h3>
                         <h3>Subject: { subject }</h3>
                     </div>
                     <div class="message">
                         <h3>Message:</h3>
                         <h4>{ message }</h4>
                     </div>
-                    <a href="http://localhost:5000/">PetalSurprise</a>
+                    <a id="website_url" href="http://localhost:5000/">PetalSurprise</a>
                 </div>
             </body>
         """
@@ -80,26 +89,31 @@ def send_email(subject, message, sender=None, receiver=None, order=None):
                     <img src="{ os.getenv('BRAND') }">
                     <div class="header">
                         <h3>Order delivered</h3>
-                        <h3>Created at: { datetime.strftime(order.created_at) }</h3>
+                        <h3>Created at: { order.created_at }</h3>
                     </div>
                     <div class="message">
-                        <h3>Details:</h3>
-                        <h4> - Recipient name: { order.recipient_name }</h4>
-                        <h4> - Recipient address: { order.recipient_address }</h4>
+                        <h3>Hello Dear Customer,</h3>
+                        <h4>We are delighted to inform you that your order has been successfully delivered!</h4>
+                        <h3>Order Details:</h3>
+                        <h4> - Recipient's name: { order.recipient_name }</h4>
+                        <h4> - Delivery Address: { order.recipient_address }</h4>
                         <h4> - Message sent: { order.recipient_address }</h4>
                         <h4> - { flowers }</h4>
                         <br>
                         <br>
-                        <h4>Thank you for choosing us!</h4>
+                        <h4>Thank you for choosing us to deliver your special gift.
+                        If you have any feedback or need further assistance,
+                        please don't hesitate to contact us.
+                        We look forward to serving you again soon!</h4>
+                        <h3>Best regards,</h3>
                     </div>
-                    <a href="http://localhost:5000/">PetalSurprise</a>
+                    <a id="website_url" href="http://localhost:5000/">PetalSurprise</a>
                 </div>
             </body>
         """
         html_content = f'<!DOCTYPE html><html lang="us">{head}{body}</html>'
-
     email = EmailMessage()
-    email['From'] = sender
+    email['From'] = USER_MAIL
     email['Subject'] = subject
     email['To'] = receiver
     email.add_alternative(html_content, subtype='html')
