@@ -97,7 +97,7 @@
                                             <div class="add_to_cart col-sm-3" onclick='addToCart({{ product | tojson | safe }})'>
                                                 <i id="{{product.id}}" class="fa fa-shopping-cart fa-2x"></i>
                                             </div>
-                                            <div class="buy_item col-sm-8" onclick='showCartItems({{ product | tojson | safe }})'>
+					    <div class="buy_item col-sm-8" onclick='showCartItems({{ product | tojson | safe }})'>
                                                 Buy
                                             </div>
                                         </div>
@@ -262,6 +262,9 @@
                         <button type="button" class="close" data-dismiss="modal" style="color: white">
                             <i class="fa fa-times"></i>
                         </button>
+			<div class="alert alert-danger update-alert-danger">
+		            <h6 class="update_alert_message"> <!-- Message to show --></h6>
+			</div>
                     </div>
                     <!-- Modal body -->
                     <div class="modal-body">
