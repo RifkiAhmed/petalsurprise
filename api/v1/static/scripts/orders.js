@@ -138,6 +138,7 @@ function updateTable(data) {
            <u><b>Charge ID:</b></u> <br>${order.charge_id}
         </h6>
         <h6><u><b>Payment Method Type:</b></u> <br>${order.payment_method_type}</h6>
+	<h6><u><b>Sender:</b></u> <br>${order.user_email}</h6>
         <h6><u><b>List Items:</b></u></h6>
         <table class='table'>
           <tr>
