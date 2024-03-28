@@ -22,6 +22,7 @@ def _orders_data(orders):
             'id': order.id,
             'created_at': datetime.strftime(
                 order.created_at, FORMAT),
+            'user_email': order.user_email,
             'recipient_name': order.recipient_name,
             'recipient_address': order.recipient_address,
             'products_number': len(order.products),
