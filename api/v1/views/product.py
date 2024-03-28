@@ -10,7 +10,7 @@ from models import storage, AUTH
 import os
 
 FORMAT = '%Y%m%d%H%M%S'
-PATH = 'api/v1/static/flowers'
+PATH = '/var/www/html/petalsurprise/static/flowers'
 
 
 @views.route("/products", methods=["POST"])
@@ -46,7 +46,7 @@ def add_products() -> str:
         image.save(file_path)
         return redirect('/')
     except Exception as e:
-        return jsonify({"message": e.message})
+        return jsonify({"message": str(e)})
 
 
 @views.route("/products", methods=["DELETE"])
@@ -59,10 +59,11 @@ def delete_product() -> str:
     id = request.form.get('id')
     try:
         product = storage.find_by(Product, id=id)
-        storage.delete(product)
-        return jsonify({"message": "Product deleted"})
+        # storage.delete(product)
+        storage.update(product, listed=False)
+        return jsonify({"message": "Product delisted"})
     except Exception as e:
-        return jsonify({"message": e.message})
+        return jsonify({"message": str(e)})
 
 
 @views.route("/products", methods=["PUT"])
@@ -109,4 +110,4 @@ def update_product() -> str:
                 product, name=name, description=description, price=int(price))
         return jsonify({"message": "Product updated successfully"})
     except Exception as e:
-        return jsonify({"message": e})
+        return jsonify({"message": str(e)})
