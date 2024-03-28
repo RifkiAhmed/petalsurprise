@@ -78,7 +78,6 @@ function checkout(id) {
   const recipient_name = $('#recipient-name').val();
   const recipient_address = $('#recipient-address').val();
   const message = $('#sender-message').val();
-
   if (products.length === 0) return;
   if (sender_email === '' && id == null) {
     $('#sender-email').css('border', '2px solid red');
@@ -92,7 +91,7 @@ function checkout(id) {
     return;
   }
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(sender_email)) {
+  if (!emailRegex.test(sender_email) && id == null) {
     $('#sender-email').css('border', '2px solid red');
     $('#sender-email').focus();
     return;
@@ -178,7 +177,7 @@ function productsWithinRange(event) {
 
 function sortProducts(element) {
   const selectedIndex = $(element).find('option:selected').index();
-  const values = { 0: 'recent_listing', 1: 'low_to_hight', 2: 'high_to_low' };
+  const values = { 0: 'recent_listing', 1: 'low_to_high', 2: 'high_to_low' };
   $.ajax({
     method: 'GET',
     url: `/index/products/${values[selectedIndex]}`,
@@ -193,11 +192,11 @@ function displayProducts(products, user) {
   $('.products').empty();
   const productsItems = products.map(product => {
     let btn_admin = '';
-    if (user.is_admin) {
+    if (user && user.is_admin) {
     btn_admin =
       `
       <div class="admin_buttons row">
-      <div class="update_item col-sm-3" onclick='fillUpdateProductModal(${ product })'>
+      <div class="update_item col-sm-3" onclick='fillUpdateProductModal(${ JSON.stringify(product) })'>
         <i class="fa fa-sync fa-2x"></i>
       </div>
       <div class="remove_item col-sm-3" onclick="deleteProduct(${ product.id })">
@@ -214,10 +213,10 @@ function displayProducts(products, user) {
           <img id src="../static/flowers/${ product.img_path }" width="100%"/>
         </div>
         <div class="user_buttons row">
-          <div class="add_to_cart col-sm-3" onclick='addToCart(${ product })'>
+          <div class="add_to_cart col-sm-3" onclick='addToCart(${ JSON.stringify(product) })'>
             <i id="${product.id}" class="fa fa-shopping-cart fa-2x"></i>
           </div>
-          <div class="buy_item col-sm-8" onclick='showCartItems(${ product })'>
+          <div class="buy_item col-sm-8" onclick='showCartItems(${ JSON.stringify(product) })'>
             Buy
           </div>
         </div>
