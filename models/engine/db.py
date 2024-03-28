@@ -35,6 +35,7 @@ class DB:
                 bind=self._engine, expire_on_commit=False)
             DBSession = scoped_session(sess_factory)
             self.__session = DBSession()
+
         return self.__session
 
     def all(self, cls):
@@ -48,7 +49,6 @@ class DB:
         if obj:
             self._session.add(obj)
             self._session.commit()
-        return None
 
     def delete(self, obj):
         """ Delete the object from the database
@@ -56,53 +56,54 @@ class DB:
         if obj:
             self._session.delete(obj)
             self._session.commit()
-        return None
 
     def save(self):
         """ Save change to the database
         """
         if self._session:
             self._session.commit()
-        return None
 
     def get_limit(self, cls, page, per_page, sort_by=None):
         """ Returns the objects corresponding to the page of size per_page
         """
-        products = self._session.query(cls)
-        if sort_by:
-            if sort_by == 'recent_listing' or sort_by == 'index':
-                products = products.order_by(cls.id.desc())
-            if sort_by == 'low_to_hight':
-                products = products.order_by(getattr(cls, 'price'))
-            if sort_by == 'high_to_low':
-                products = products.order_by(getattr(cls, 'price').desc())
-        if not sort_by or sort_by == 'index':
+        products = self._session.query(cls).filter(cls.listed == True)
+        
+        if sort_by == 'recent_listing':
+            products = products.order_by(cls.id.desc())
+        elif sort_by == 'low_to_high':
+            products = products.order_by(cls.price)
+        elif sort_by == 'high_to_low':
+            products = products.order_by(cls.price.desc())
+        elif sort_by == 'index':
+            products_count = self.count(cls)
             start = page * per_page
             end = start + per_page
-            products_count = self.count(cls)
-            if end > products_count:
-                end = products_count
-            products = products.slice(start, end).all()
-        return products
+            products = products.order_by(cls.id.desc()).slice(start, end)
+        
+        return products.all()
+    
 
     def get_range_filter(self, cls, min_price, max_price):
         """ Returns the objects within a specified price range
         """
-        if min_price and max_price:
-            return self._session.query(cls).filter(and_(
-                cls.price >= min_price, cls.price <= max_price)).all()
-        elif min_price:
-            return self._session.query(cls).filter(
-                cls.price >= min_price).all()
-        elif max_price:
-            return self._session.query(cls).filter(
-                cls.price <= max_price).all()
+        products = self._session.query(cls).filter(cls.listed == True)
+
+        if min_price is not None:
+            products = products.filter(cls.price >= min_price)
+        if max_price is not None:
+            products = products.filter(cls.price <= max_price)
+
+        return products.all()
 
     def get_string_filter(self, cls, search_name):
         """ Returns the objects whose name contains a given pattern
         """
-        return self._session.query(cls) \
-            .filter(cls.name.like(f'%{search_name}%')).all()
+        products = self._session.query(cls).filter(cls.listed == True)
+
+        if search_name:
+            products = products.filter(cls.name.like(f'%{search_name}%'))
+
+        return products.all()
 
     def find_by(self, cls, **kwargs):
         """ Returns the first object based on the given keyword argument
@@ -110,12 +111,14 @@ class DB:
         obj = self._session.query(cls).filter_by(**kwargs).first()
         if not obj:
             raise NoResultFound
+
         return obj
 
     def find_all(self, cls, **kwargs):
         """ Returns all the objects based on the given keyword argument
         """
         objs = self._session.query(cls).filter_by(**kwargs).all()
+
         return objs
 
     def orders_overview(self, cls):
@@ -133,6 +136,7 @@ class DB:
             func.sum(cls.amount).label('total_amount')) \
             .group_by(func.date(cls.created_at)) \
             .all()
+
         return [stats_1, stats_2]
 
     def update(self, obj, **kwargs) -> None:
@@ -148,6 +152,7 @@ class DB:
                 self._session.commit()
         except IntegrityError:
             raise ValueError
+
         return None
 
     def count(self, cls):
