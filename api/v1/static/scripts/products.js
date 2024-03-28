@@ -13,11 +13,6 @@ function addProducts(event) {
   const price = $("#flower-price").val();
   const description = $("#flower-description").val();
   const path = $("#customFile")[0].files[0];
-  const formData = new FormData();
-  formData.append("name", name);
-  formData.append("price", price);
-  formData.append("description", description);
-  formData.append("image", path);
 
   if (name === '') {
     $("#flower-name").css('border', '2px solid red');
@@ -31,6 +26,13 @@ function addProducts(event) {
     $(".custom-file").css('outline', '2px solid red');
     return;
   }
+
+  const formData = new FormData();
+  formData.append("name", name);
+  formData.append("price", price);
+  formData.append("description", description);
+  formData.append("image", path);
+
   $.ajax({
     method: 'POST',
     url: "/products",
@@ -44,7 +46,7 @@ function addProducts(event) {
       $('.alert_message').text(error.responseJSON.error);
       $('.alert-danger').css('display', 'block');
       setTimeout(() => $('.alert-danger').css('display', 'none'), 3000);
-      console.log("Error:", error.responseJSON.message);
+      console.log("Error:", error.responseJSON.error);
     },
   });
 }
@@ -111,10 +113,10 @@ function submitUpdateProduct(event, id) {
       window.location.href = '/';
     },
     error: (error) => {
-      $('.alert_message').text(error.responseJSON.message);
-      $('.alert-danger').css('display', 'block');
-      setTimeout(() => $('.alert-danger').css('display', 'none'), 3000);
-      console.log("Error:", error.responseJSON.message);
+      $('.update_alert_message').text(JSON.parse(error.responseText).error);
+      $('.update-alert-danger').css('display', 'block');
+      setTimeout(() => $('.update-alert-danger').css('display', 'none'), 3000);
+      console.log("Error:", JSON.parse(error.responseText).error);
     },
   });
 }
