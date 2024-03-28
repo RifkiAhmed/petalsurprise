@@ -55,10 +55,11 @@ function updateProfile(prop) {
     method: 'PUT',
     data,
     success: (response) => {
-      window.location.href = '/profile';
       $('.alert-info').css('display', 'block');
       $('.alert-info').html(`<strong> ${response.message} successfully </strong>`);
-      setInterval(() =>  $('.alert-info').css('display', 'none'), 3000);
+      setInterval(() =>  {
+	$('.alert-info').css('display', 'none');
+	window.location.href = '/profile';}, 700);
     },
     error: (error) => {
       $('.alert-danger').css('display', 'block');
