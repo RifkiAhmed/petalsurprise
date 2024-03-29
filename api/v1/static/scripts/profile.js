@@ -1,12 +1,15 @@
+const { setTimeout } = require("timers");
+
+// Show the user name input field
 function showUserNameInput() {
   $('#username-link').css('display', 'none');
   $('#username').css('display', 'inline-block');
   $('#save-username').css('display', 'inline-block');
 }
 
+// Submit the changes for the user profile based on the property passed as argument
 function updateProfile(prop) {
   removeAlert();
-
   let data = {};
 
   if (prop === 'username') {
@@ -61,18 +64,19 @@ function updateProfile(prop) {
 	$('.alert-info').css('display', 'none');
 	window.location.href = '/profile';}, 700);
     },
-    error: (error) => {
+    error: () => {
       $('.alert-danger').css('display', 'block');
       if (prop === 'username') {
         $('.alert_message').html('<strong> Username already registred </strong>');
       } else if (prop === 'email') {
         $('.alert_message').html('<strong> Email already registred </strong>');
       } else $('.alert_message').html('<strong> Invalid password </strong>');
-      setInterval(() =>  $('.alert-danger').css('display', 'none'), 3000);
+      setTimeout(() =>  $('.alert-danger').css('display', 'none'), 3000);
     }
   });
 }
 
+// List orders of the authnenticated user
 function userOrders() {
   hideContainers();
   $('.li-orders').css('color', 'white');
@@ -139,6 +143,7 @@ function userOrders() {
   })
 }
 
+// Show order's details with the id passed as argument
 function showDetails(order_id) {
   const $detailsRow = $(`.${order_id}`);
   if ($detailsRow.css('display') === 'none') {
@@ -150,23 +155,21 @@ function showDetails(order_id) {
   }
 }
 
+// Show the user email input field
 function userProfile() {
   hideContainers();
   $('.li-profile').css('color', 'white');
   $('.updateEmailForm').css('display', 'block');
 }
 
-function userWishes() {
-  hideContainers();
-  $('.li-wishes').css('color', 'white');
-}
-
+// Show the form to update the user password
 function showChangePassword() {
   hideContainers();
   $('.li-profile').css('color', 'white');
   $('.changePasswordForm').css('display', 'block');
 }
 
+// Hide container and Remove the style for the input fields
 function hideContainers() {
   $('li').css('color', 'grey');
   $('.updateEmailForm').css('display', 'none');
@@ -177,11 +180,11 @@ function hideContainers() {
   $('#pwd-1').css('border', '0px');
   $('#pwd-2').css('border', '0px');
   $('.list-orders').css('display', 'none');
-  $('.list-wishes').css('display', 'none');
   $('.alert-info').css('display', 'none');
   $('.alert-danger').css('display', 'none');
 }
 
+// Remove the style from the input fields
 function removeAlert() {
   $('#username').css('border', '0px');
   $('#pwd-0').css('border', '0px');
@@ -189,6 +192,7 @@ function removeAlert() {
   $('#pwd-2').css('border', '0px');
 }
 
+// Show the drop down menu of the profile and loqout options
 function dropDownMenu() {
   $('.menu-dropdown').css('display', 'block');
 }

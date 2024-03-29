@@ -1,21 +1,23 @@
+// Displat the default all orders after the document has benn loaded
 document.addEventListener('DOMContentLoaded', function() {
-  orderStatus(undefined, 'Load');
+  orderStatus(undefined, 'all');
 });
 
+// List products based on the status value
 function orderStatus(event, arg) {
   if (event) {
     event.preventDefault();
   }
   const status = $('#status').val();
   data = { status };
-  if (arg !== 'Load') {
+  if (arg !== 'all') {
     const from = $('#from').val();
     const to = $('#to').val();
     if (from) {
-      data = { ...data, from};
+      data = { ...data, from };
     }
     if (to) {
-      data = { ...data, to};
+      data = { ...data, to };
     }
   }
 
@@ -32,6 +34,7 @@ function orderStatus(event, arg) {
   });
 }
 
+// Update the order status with the id argument given
 function updateStatus(orderId, status) {
   $.ajax({
     type: "PUT",
@@ -46,6 +49,7 @@ function updateStatus(orderId, status) {
   });
 }
 
+// Refund user 
 function refundCustomer(chargeId, orderId) {
   $.ajax({
     type: "PUT",
@@ -60,10 +64,11 @@ function refundCustomer(chargeId, orderId) {
   });
 }
 
-function updateTable(data) {
+// Fill the table of orders with the orders passed as argument
+function updateTable(orders) {
   const tbody = $('#orders-table-tbody');
   tbody.empty();
-  const rows = data.map(order => {
+  const rows = orders.map(order => {
     let actions;
     let products = order.products.map((product, i) => `
     <tr>
@@ -156,6 +161,7 @@ function updateTable(data) {
   tbody.append(rows);
 }
 
+// Show the order details with the id passed as argument
 let show_details_id;
 function showDetails(order_id) {
   const $mainRow = $(`.main_${order_id}`);

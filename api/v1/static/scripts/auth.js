@@ -1,3 +1,4 @@
+// Add new user to the databse
 function register(event) {
   event.preventDefault();
   const email = $('#email').val();
@@ -11,6 +12,7 @@ function register(event) {
     setTimeout(() => $('.alert-danger').css('display', 'none'), 3000);
     return;
   }
+
   if (pwd_1 !== pwd_2 || pwd_1 === '') {
     $('.alert_message').text('Passwords do not match');
     if (pwd_1 === '') { $('.alert_message').text('Password should not be empty'); };
@@ -18,6 +20,7 @@ function register(event) {
     setTimeout(() => $('.alert-danger').css('display', 'none'), 3000);
     return;
   }
+
   $.ajax({
     method: 'POST',
     url: '/users',
@@ -34,6 +37,7 @@ function register(event) {
   });
 }
 
+// Connect user with the web application
 function connect(event) {
   event.preventDefault();
   const email = $('#email').val();
@@ -54,6 +58,7 @@ function connect(event) {
   });
 }
 
+// disconnect the user from the web application
 function disconnect(event) {
   event.preventDefault();
   $.ajax({
@@ -68,10 +73,12 @@ function disconnect(event) {
   });
 }
 
+// Display the dropdown menu 
 function dropDownMenu() {
   $('.menu-dropdown').css('display', 'block');
 }
 
+// Update the page content for the sign up and sign in forms
 function signUp() {
   $('.btn-connect').css('display', 'none');
   $('.btn-sign-up').css('display', 'none');

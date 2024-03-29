@@ -2,17 +2,25 @@ const stripe = Stripe('pk_test_51OsCjcRoWq4O3O1iVOgvSSwgvhUGeMjnlC1FttsEeCbpptE1
 let cart = [];
 let products = [];
 
+// Fill the cart badge when the document has been loaded
 $(document).ready(function() {
   const $badge = $('#badge');
   $badge.html(cart.length);
 });
 
+// Show price filters
+function showFilters() {
+  $('.filters').toggle();
+}
+
+// Removes the borders from the inputs fields of the checkout form
 function checkoutRemoveBorders() {
   $('#sender-email').css('border', '0px');
   $('#recipient-name').css('border', '0px');
   $('#recipient-address').css('border', '0px');
 }
 
+// Add or remove a product from the cart
 function addToCart(product) {
   $('.list-items').eq(0).css('visibility', 'hidden');
   $('.add-new-item').eq(0).css('visibility', 'hidden');
@@ -34,6 +42,7 @@ function addToCart(product) {
   }
 }
 
+// Dispaly the items in the cart
 async function showCartItems(product) {
   const $listOfItems = $('#list-items');
   const $table = $('<table class="table" style="background-color: rgba(0, 0, 0, 0.3); color: #ffffff"></table>');
@@ -68,17 +77,19 @@ async function showCartItems(product) {
   $('.list-items').eq(0).css('visibility', 'visible');
 }
 
+// Show the add item modal
 function showAddItemsModal(className) {
   $(`.${className}`).eq(0).css('visibility', 'visible');
 }
 
+// Create a stripe checkout session and redirect the user to the payment page
 function checkout(id) {
   checkoutRemoveBorders();
+  if (products.length === 0) return;
   const sender_email = $('#sender-email').val();
   const recipient_name = $('#recipient-name').val();
   const recipient_address = $('#recipient-address').val();
   const message = $('#sender-message').val();
-  if (products.length === 0) return;
   if (sender_email === '' && id == null) {
     $('#sender-email').css('border', '2px solid red');
     $('#sender-email').focus();
@@ -90,22 +101,26 @@ function checkout(id) {
     $('#sender-email').focus();
     return;
   }
+
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(sender_email) && id == null) {
     $('#sender-email').css('border', '2px solid red');
     $('#sender-email').focus();
     return;
   }
+
   if (recipient_name === '') {
     $('#recipient-name').css('border', '2px solid red');
     $('#recipient-name').focus();
     return;
   }
+
   if (recipient_address === '') {
     $('#recipient-address').css('border', '2px solid red');
     $('#recipient-address').focus();
     return;
   }
+
   fetch('/create-checkout-session', {
     method: 'POST',
     headers: {
@@ -129,10 +144,7 @@ function checkout(id) {
   });
 };
 
-function showFilters() {
-  $('.filters').toggle();
-}
-
+// Search for products with the name matchs an input value
 function searchWithName(event) {
   event.preventDefault();
   $('#search').css('border', '0px');
@@ -153,7 +165,7 @@ function searchWithName(event) {
   });
 }
 
-
+// Search for products with a price within a range values
 function productsWithinRange(event) {
   event.preventDefault();
   $('#min-price').css('border', '0px');
@@ -175,6 +187,7 @@ function productsWithinRange(event) {
   });
 }
 
+// Sort products despending on the selected option
 function sortProducts(element) {
   const selectedIndex = $(element).find('option:selected').index();
   const values = { 0: 'recent_listing', 1: 'low_to_high', 2: 'high_to_low' };
@@ -188,6 +201,7 @@ function sortProducts(element) {
   });
 }
 
+// Display the products on the page
 function displayProducts(products, user) {
   $('.products').empty();
   const productsItems = products.map(product => {

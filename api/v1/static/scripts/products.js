@@ -1,3 +1,4 @@
+// Remove borders style of the inputs fields
 function removeBorders() {
   $("#flower-name").css('border', '0px');
   $("#flower-price").css('border', '0px');
@@ -6,6 +7,7 @@ function removeBorders() {
   $("#product-new-price").css('border', '0px');
 }
 
+// Add new product to the database
 function addProducts(event) {
   event.preventDefault();
   removeBorders();
@@ -22,6 +24,7 @@ function addProducts(event) {
     $("#flower-price").css('border', '2px solid red');
     return;
   }
+
   if (path === undefined) {
     $(".custom-file").css('outline', '2px solid red');
     return;
@@ -51,6 +54,7 @@ function addProducts(event) {
   });
 }
 
+// Delete product with the id passed as agument from the database
 function deleteProduct(id) {
   $.ajax({
     type: "DELETE",
@@ -65,6 +69,7 @@ function deleteProduct(id) {
   });
 }
 
+// Fill inputs fields of the update product modal with the data of the product passed as argument
 function fillUpdateProductModal(product) {
   $('#product-name-id').text(`${product.name} #${product.id}`);
   $('#product-new-name').val(product.name);
@@ -79,6 +84,7 @@ function fillUpdateProductModal(product) {
   $('#updateProduct').modal('show');
 }
 
+// Submit the changes for the product with the id passed as argument
 function submitUpdateProduct(event, id) {
   event.preventDefault();
   removeBorders();
@@ -120,4 +126,3 @@ function submitUpdateProduct(event, id) {
     },
   });
 }
-
