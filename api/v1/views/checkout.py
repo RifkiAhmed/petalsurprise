@@ -15,6 +15,8 @@ stripe.api_key = os.getenv('STRIPE_API_KEY')
 
 @views.route('/create-checkout-session', methods=['POST'])
 def create_checkout_session():
+    """ Create Stripe checkout session and return it's id
+    """
     user = AUTH.get_user_from_session_id(request.cookies.get('session_id'))
     data = request.get_json()
     cart = data.get('cart', [])
@@ -56,6 +58,8 @@ def create_checkout_session():
 
 @views.route('/webhook', methods=['POST'])
 def stripe_webhook():
+    """ handling webhook payment_intent.succeeded event
+    """
     payload = request.get_data(as_text=True)
     sig_header = request.headers.get('Stripe-Signature')
     try:
