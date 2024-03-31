@@ -13,5 +13,5 @@ class Product(BaseModel, Base):
     name = Column(String(250), nullable=False)
     price = Column(Integer, nullable=False)
     description = Column(String(250), nullable=True)
-    img_path = Column(String(250), nullable=False)
+    filename = Column(String(250), nullable=False)
     listed = Column(Boolean, default=True)
