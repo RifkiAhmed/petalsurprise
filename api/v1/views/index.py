@@ -3,85 +3,77 @@
 Index view for the API
 """
 from api.v1.views import views
-from flask import render_template, request, redirect, url_for
+from flask import render_template, request, redirect, url_for, jsonify
 from models import storage, AUTH
 from models.product import Product
 import os
 
 
-@views.route('/', methods=['GET', 'POST'])
+@views.route('/', methods=['GET'])
 def index():
     """Return index page"""
     user = AUTH.get_user_from_session_id(request.cookies.get('session_id'))
     current_page = request.args.get('page', 1, type=int)
-    products = []
-    products = storage.get_limit(
-        Product, current_page - 1, int(os.getenv('PER_PAGE')), 'index')
-    serialized_products = [p.to_dict() for p in products]
-    size = storage.count(Product)
-    page = {'has_prev': True, 'has_next': True, 'num': current_page}
-    if current_page == 1:
-        page['has_prev'] = False
-    if (current_page * int(os.getenv('PER_PAGE'))) >= size:
-        page['has_next'] = False
+    per_page = int(os.getenv('PER_PAGE'))
+
+    products, count_listed = storage.get_limit(
+        cls=Product, page=current_page - 1, per_page=per_page)
+    products_list = [p.to_dict() for p in products]
+
+    page = {'num': current_page}
+    page['has_prev'] = True if current_page > 1 else False
+    end_index = current_page * per_page
+    page['has_next'] = True if end_index < count_listed else False
+
     return render_template('index.html', user=user,
-                           products=serialized_products, page=page)
+                           products=products_list, page=page)
 
 
-@views.route('/range', methods=['GET', 'POST'])
+@views.route('/range', methods=['GET'])
 def range():
     """Return index page"""
     user = AUTH.get_user_from_session_id(request.cookies.get('session_id'))
-    min_price = request.form.get('min_price', type=float)
-    max_price = request.form.get('max_price', type=float)
-    products = []
+    min_price = request.args.get('min_price', type=int)
+    max_price = request.args.get('max_price', type=int)
+
     if not min_price and not max_price:
         return redirect(url_for('views.index'))
+
     products = storage.get_range_filter(Product, min_price, max_price)
-    serialized_products = [p.to_dict() for p in products]
-    page = {'has_prev': False, 'has_next': False, 'num': 1}
+    products_list = [p.to_dict() for p in products]
+
     user = user.to_dict() if user else None
-    return {
-        "products": serialized_products,
-        "page": page,
-        "user": user}
+    return jsonify({"products": products_list, "user": user}), 200
 
 
-@views.route('/search', methods=['GET', 'POST'])
-def string_search():
+@views.route('/search', methods=['GET'])
+def search():
     """Return index page"""
     user = AUTH.get_user_from_session_id(request.cookies.get('session_id'))
-    search_with_name = request.form.get('search-string')
-    products = []
-    if not search_with_name:
+    name = request.args.get('name')
+
+    if not name:
         return redirect(url_for('views.index'))
-    products = storage.get_string_filter(Product, search_with_name)
-    serialized_products = [p.to_dict() for p in products]
-    page = {'has_prev': False, 'has_next': False, 'num': 1}
+
+    products = storage.get_string_filter(Product, name)
+    products_list = [p.to_dict() for p in products]
+
     user = user.to_dict() if user else None
-    return {
-        "products": serialized_products,
-        "page": page,
-        "user": user}
+    return jsonify({"products": products_list, "user": user}), 200
 
 
-@views.route('/index/products/<sort_by>', methods=['GET'])
-def products_sorted(sort_by):
+@views.route('/products_sorted', methods=['GET'])
+def products_sorted():
     """Return index page"""
     user = AUTH.get_user_from_session_id(request.cookies.get('session_id'))
-    products = []
-    products = storage.get_limit(
-        cls=Product,
-        page=None,
-        per_page=None,
-        sort_by=sort_by)
-    serialized_products = [p.to_dict() for p in products]
-    page = {'has_prev': False, 'has_next': False, 'num': 1}
+    sort_by = request.args.get('sort_by')
+
+    products, _ = storage.get_limit(cls=Product, page=None, per_page=None,
+                                    sort_by=sort_by)
+    products_list = [p.to_dict() for p in products]
+
     user = user.to_dict() if user else None
-    return {
-        "products": serialized_products,
-        "page": page,
-        "user": user}
+    return jsonify({"products": products_list, "user": user}), 200
 
 
 @views.route('/contact', methods=["GET"])
@@ -94,19 +86,21 @@ def contact():
 @views.route('/contact', methods=["POST"])
 def send_email():
     """Return index page"""
-    user = AUTH.get_user_from_session_id(request.cookies.get('session_id'))
     from api.v1 import send_email
+
+    user = AUTH.get_user_from_session_id(request.cookies.get('session_id'))
     email = request.form.get('email')
     subject = request.form.get('subject')
     message = request.form.get('message')
+
     if not email:
         email = user.email
-    send_email(
-        subject=subject,
-        message=message,
-        sender=email,
-        receiver=os.getenv('USER_MAIL'))
-    return ({"message": "Message sent successfully!"})
+
+    receiver = os.getenv('USER_MAIL')
+    send_email(subject=subject, message=message, sender=email,
+               receiver=receiver)
+
+    return jsonify({"message": "Message sent successfully!"}), 200
 
 
 @views.route('/about')
