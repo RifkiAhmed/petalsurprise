@@ -1,13 +1,13 @@
 .content {
     margin: 0px;
 }
-
 .main_content {
     display: flex;
     justify-content: center;
     color: #ffffff;
+    padding: 40px 10px;
+    border-radius: 8px;
 }
-
 .items_list {
     display: flex;
     justify-content: center;
@@ -15,47 +15,38 @@
     padding: 0px 0px;
     margin: auto;
 }
-
 .welcoming_text h1 {
     font-family:Verdana, Geneva, Tahoma, sans-serif;
-    margin: 40px 0px 0px 5px;
+    margin: 5px;
 }
-
 .welcoming_text h4 {
     font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
     margin: 0px 10px 20px 5px;
     color: #9a8c98;
 }
-
 .filters {
     display: none;
     flex: 1 0 -1px;
 }
-
 .filters > div {
     padding: 20px 30px;
 }
-
 #select-filter-products {
     background-color: rgba(0, 0, 0, 0.3);
     color: #ffffff;
 }
-
 #filter-products {
     width: 380px;
     margin: 0 10px 0 auto;
 }
-
 .products {
     flex: 2;
     flex-wrap: wrap;
     justify-content: center;
 }
-
 .item {
     float: left;
 }
-
 .item, .filters > div {
     width: 300px;
     background-color: rgba(109, 89, 122, 0.4);
@@ -63,29 +54,23 @@
     margin: 5px;
     border-radius: 8px;
 }
-
 .item_img {
     position: relative;
 }
-
 .item_img img {
     border-radius: 8px;
     height: 305px;
 }
-
 .item_img:hover img {
     filter: blur(2px);
 }
-
 .item_img:hover .user_buttons,
 .item_img:hover .admin_buttons {
     visibility: visible;
 }
-
 .image-placeholder {
     height: 305px;
 }
-
 .admin_buttons {
     visibility: hidden;
     position: absolute;
@@ -96,12 +81,10 @@
     flex-direction: column;
     align-items: end;
 }
-
 .admin_buttons > div {
     margin-bottom: 5px;
     cursor: pointer;
 }
-
 .user_buttons {
     visibility: hidden;
     position: absolute;
@@ -111,11 +94,9 @@
     display: flex;
     justify-content: space-around;
 }
-
 .user_buttons > div {
     cursor: pointer;
 }
-
 .buy_item {
     display: flex;
     justify-content: center;
@@ -126,7 +107,6 @@
     border-radius: 8px;
     color: #ffffff;
 }
-
 .item_price {
     display: flex;
     justify-content: space-between;
@@ -134,7 +114,6 @@
     border-radius: 8px;
     background-color:rgb(169, 169, 169, 0.4);
 }
-
 .fa-shopping-cart,
 .fa-plus,
 .fa-list {
@@ -146,11 +125,9 @@
     background-color: (109, 89, 122);
     border-radius: 8px;
 }
-
 .fa-shopping-cart {
     background-color: #272640;
 }
-
 .fa-filter {
     padding: 10px;
     margin: 0px 10px 0px 5px;
@@ -159,7 +136,6 @@
     border-radius: 4px;
     cursor: pointer;
 }
-
 [class^="fa"]:hover,
 .buy_item:hover {
     background-color: rgba(109, 89, 122, 0.7);
@@ -170,23 +146,19 @@
     background-color: #272640;
     border-radius: 8px;
 }
-
 .fa-times {
     padding: 8px 13px ;
     color: #f94144;
     background-color: #272640;
     border-radius: 8px;
 }
-
 .right_content,
 .left_content {
     display: flex;
     flex-direction: column;
     align-items: end;
     padding: 10px;
-
 }
-
 .shopping {
     display: flex;
     flex-direction: column;
@@ -194,18 +166,15 @@
     position: sticky;
     z-index: 1;
 }
-
 .badge {
     position: absolute;
     top: -8px;
     right: 4px;
     background-color: #ffd60a !important;
 }
-
 .cart:hover {
     cursor: pointer;
 }
-
 .list-items, .add-new-item {
     visibility: hidden;
     position: fixed;
@@ -221,12 +190,13 @@
     border: 4px solid #ffffff;
     box-shadow: -20px 3px rgba(0, 0, 0, 0.6), 20px 0 3px rgba(0, 0, 0, 0.6);
 }
-
 .list-items > div:nth-child(2),
 .add-new-item > div:nth-child(2) {
     padding: 10px 30px;
 }
-
+.pagination {
+    margin-bottom: 70px;
+}
 .circular {
     display: inline-block;
     padding: 12px 20px;
@@ -241,44 +211,35 @@
     color: #fff;
     border: 1px solid white;
 }
-
 .circular:hover {
     text-decoration: none;
 }
-
 .enabled:hover {
     background-color: green;
     color: #fff;
 }
-
 .product-image {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
 }
-
 .fa-pen {
     padding: 5px 8px;
 }
-
 .disabled {
     pointer-events: none;
     background-color: grey;
 }
-
 .modal {
     background-image: radial-gradient(circle,#6d597a, rgba(154, 140, 152, 0.8));  
 }
-
 .modal-content {
     background-color: #272640
 }
-
 .modal-title {
     color: white
 }
-
 .modal-body {
     width: 500px;
     margin: auto;
