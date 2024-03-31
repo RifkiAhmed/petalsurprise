@@ -1,9 +1,9 @@
-const { setTimeout } = require("timers");
 
 // Show the user name input field
 function showUserNameInput() {
   $('#username-link').css('display', 'none');
   $('#username').css('display', 'inline-block');
+  $('#username').focus();
   $('#save-username').css('display', 'inline-block');
 }
 
@@ -101,7 +101,7 @@ function userOrders() {
         let products = order.products.map((product, i) => `
         <tr>
           <td>N°${i + 1}</td>
-          <td><img src="../static/flowers/${product.image}" height="40px"></td>
+          <td><img src="../static/flowers/${product.filename}" height="40px"></td>
           <td>${product.name}</td>
         </tr>`).join('');
         return `
