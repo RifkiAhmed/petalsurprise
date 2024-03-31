@@ -21,26 +21,52 @@ function checkoutRemoveBorders() {
 }
 
 // Add or remove a product from the cart
-function addToCart(product) {
+function addToCart(product_id) {
   $('.list-items').eq(0).css('visibility', 'hidden');
   $('.add-new-item').eq(0).css('visibility', 'hidden');
-  try {
-    const $badge = $('#badge');
-    const $count = parseInt($badge.html()) || 0;
-    if (cart.some(item => item.id === product.id)) {
-      cart = cart.filter(item => item.id !== product.id);
-      $badge.html($count - 1);
-      $(`#${product.id}`).css('color', '#ffffff');
-    } else {
-      cart.push(product);
-      $badge.html($count + 1);
-      $(`#${product.id}`).css('color', '#ffd60a');
-    }
-    localStorage.setItem('cart', JSON.stringify(cart));
-  } catch (err) {
-    console.error(err.message);
-  }
+
+  $.ajax({
+    method: 'GET',
+    url: `/product/${product_id}`,
+    success: (response) => { 
+      product = response;
+      try {
+        const $badge = $('#badge');
+        const $count = parseInt($badge.html()) || 0;
+        if (cart.some(item => item.id === product.id)) {
+          cart = cart.filter(item => item.id !== product.id);
+          $badge.html($count - 1);
+          $(`#${product.id}`).css('color', '#ffffff');
+        } else {
+          cart.push(product);
+          $badge.html($count + 1);
+          $(`#${product.id}`).css('color', '#ffd60a');
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    error: (error) => { console.log('Error:', error.statusText); }
+  });
 }
+
+
+// Add or remove a product from the cart
+function buy(product_id) {
+  $('.list-items').eq(0).css('visibility', 'hidden');
+  $('.add-new-item').eq(0).css('visibility', 'hidden');
+
+  $.ajax({
+    method: 'GET',
+    url: `/product/${product_id}`,
+    success: (response) => { 
+      product = response;
+      showCartItems(product);
+    },
+    error: (error) => { console.log('Error:', error.statusText); }
+  });
+}
+
 
 // Dispaly the items in the cart
 async function showCartItems(product) {
@@ -49,6 +75,7 @@ async function showCartItems(product) {
   $table.append('<thead><tr><th></th><th>Flower</th><th>Price</th></tr></thead>');
 
   $listOfItems.empty();
+
   products = product ? [product] : cart;
 
   let $itemsContent = products.length > 0
@@ -56,7 +83,7 @@ async function showCartItems(product) {
     <tr>
     <td><h6 style="padding: 8px 0px">N°${i + 1}</h6></td>
     <td>
-      <img src="../static/flowers/${item.img_path}" height="40px">
+      <img src="../static/flowers/${item.filename}" height="40px">
       <h6 style="display: inline-block">${item.name} #${item.id}</h6>
     </td>
     <td><h6 style="padding: 8px 0px">$${item.price}</h6></td>      
@@ -148,20 +175,20 @@ function checkout(id) {
 function searchWithName(event) {
   event.preventDefault();
   $('#search').css('border', '0px');
-  let searchString = $('#search').val();
+  let name = $('#search').val();
 
-  if (searchString === '') {
+  if (name === '') {
     $('#search').css('border', '2px solid red');
     return;
   };
+
   $.ajax({
-    method: 'POST',
-    url: '/search',
-    data: { 'search-string': searchString },
+    method: 'GET',
+    url: `/search?name=${name}`,
     success: (response) => { 
-      displayProducts(response.products, response.user);
+      displayProducts(response.products, response.user, response.page);
     },
-    error: (error) => { console.log(`Error: ${error}`); }
+    error: (error) => { console.log('Error:', error.statusText); }
   });
 }
 
@@ -176,14 +203,14 @@ function productsWithinRange(event) {
   if (min_price === '' && max_price === '') {
     return;
   };
+
   $.ajax({
-    method: 'POST',
-    url: '/range',
-    data: { min_price, max_price },
+    method: 'GET',
+    url: `/range?min_price=${min_price}&max_price=${max_price}`,
     success: (response) => { 
-      displayProducts(response.products, response.user);
+      displayProducts(response.products, response.user, response.page);
     },
-    error: (error) => { console.log(`Error: ${error}`); }
+    error: (error) => { console.log('Error:', error.statusText); }
   });
 }
 
@@ -191,26 +218,28 @@ function productsWithinRange(event) {
 function sortProducts(element) {
   const selectedIndex = $(element).find('option:selected').index();
   const values = { 0: 'recent_listing', 1: 'low_to_high', 2: 'high_to_low' };
+
   $.ajax({
     method: 'GET',
-    url: `/index/products/${values[selectedIndex]}`,
-    success: (response) => { 
-      displayProducts(response.products, response.user);
+    url: `/products_sorted?sort_by=${values[selectedIndex]}`,
+    success: (response) => {
+      displayProducts(response.products, response.user, response.page);
     },
-    error: (error) => { console.log(`Error: ${error}`); }
+    error: (error) => { console.log('Error:', error.statusText); }
   });
 }
 
 // Display the products on the page
-function displayProducts(products, user) {
+function displayProducts(products, user, page) {
   $('.products').empty();
+  console.log(page);
   const productsItems = products.map(product => {
     let btn_admin = '';
     if (user && user.is_admin) {
     btn_admin =
       `
       <div class="admin_buttons row">
-      <div class="update_item col-sm-3" onclick='fillUpdateProductModal(${ JSON.stringify(product) })'>
+      <div class="update_item col-sm-3" onclick='fillUpdateProductModal(${ product.id })'>
         <i class="fa fa-sync fa-2x"></i>
       </div>
       <div class="remove_item col-sm-3" onclick="deleteProduct(${ product.id })">
@@ -224,13 +253,13 @@ function displayProducts(products, user) {
     <div>
       <div class="item_img">
         <div class="image-placeholder">
-          <img id src="../static/flowers/${ product.img_path }" width="100%"/>
+          <img id src="../static/flowers/${ product.filename }" width="100%"/>
         </div>
         <div class="user_buttons row">
-          <div class="add_to_cart col-sm-3" onclick='addToCart(${ JSON.stringify(product) })'>
+          <div class="add_to_cart col-sm-3" onclick='addToCart(${ product.id })'>
             <i id="${product.id}" class="fa fa-shopping-cart fa-2x"></i>
           </div>
-          <div class="buy_item col-sm-8" onclick='showCartItems(${ JSON.stringify(product) })'>
+          <div class="buy_item col-sm-8" onclick='buy(${ product.id })'>
             Buy
           </div>
         </div>
@@ -242,7 +271,7 @@ function displayProducts(products, user) {
         <span><h5>${ product.name }</h5></span>
         <!-- flower description -->
         <div>
-          <h6>9 flowers</h6>
+          <h6>${ product.description || '&nbsp;'  }</h6>
         </div>
       </div>
       <!-- flower price -->
