@@ -66,49 +66,53 @@ class DB:
     def get_limit(self, cls, page, per_page, sort_by=None):
         """ Returns the objects corresponding to the page of size per_page
         """
-        products = self._session.query(cls).filter(cls.listed == True)
-        
+        query = self._session.query(cls).filter(cls.listed == 1)
+        count_listed = self._session.query(cls).filter(cls.listed == 1).count()
+
         if sort_by == 'recent_listing':
-            products = products.order_by(cls.id.desc())
+            query = query.order_by(cls.id.desc())
         elif sort_by == 'low_to_high':
-            products = products.order_by(cls.price)
+            query = query.order_by(cls.price)
         elif sort_by == 'high_to_low':
-            products = products.order_by(cls.price.desc())
-        elif sort_by == 'index':
-            products_count = self.count(cls)
+            query = query.order_by(cls.price.desc())
+        else:
+            count = self.count(cls)
             start = page * per_page
-            end = start + per_page
-            products = products.order_by(cls.id.desc()).slice(start, end)
-        
-        return products.all()
-    
+            end = (start + per_page) if (start + per_page) < count else count
+            query = query.order_by(cls.id.desc()).slice(start, end)
+
+        products = query.all()
+        return products, count_listed
 
     def get_range_filter(self, cls, min_price, max_price):
         """ Returns the objects within a specified price range
         """
-        products = self._session.query(cls).filter(cls.listed == True)
+        query = self._session.query(cls).filter(cls.listed)
 
         if min_price is not None:
-            products = products.filter(cls.price >= min_price)
+            query = query.filter(cls.price >= min_price)
         if max_price is not None:
-            products = products.filter(cls.price <= max_price)
+            query = query.filter(cls.price <= max_price)
+        products = query.all()
 
-        return products.all()
+        return products
 
     def get_string_filter(self, cls, search_name):
         """ Returns the objects whose name contains a given pattern
         """
-        products = self._session.query(cls).filter(cls.listed == True)
+        query = self._session.query(cls).filter(cls.listed)
 
         if search_name:
-            products = products.filter(cls.name.like(f'%{search_name}%'))
+            query = query.filter(cls.name.like(f'%{search_name}%'))
+        products = query.all()
 
-        return products.all()
+        return products
 
     def find_by(self, cls, **kwargs):
         """ Returns the first object based on the given keyword argument
         """
         obj = self._session.query(cls).filter_by(**kwargs).first()
+
         if not obj:
             raise NoResultFound
 
@@ -118,6 +122,9 @@ class DB:
         """ Returns all the objects based on the given keyword argument
         """
         objs = self._session.query(cls).filter_by(**kwargs).all()
+
+        if objs is None:
+            raise NoResultFound
 
         return objs
 
@@ -130,12 +137,16 @@ class DB:
             func.sum(cls.amount).label('total_amount')) \
             .group_by(cls.status) \
             .all()
+
         stats_2 = self._session.query(
             func.date(cls.created_at).label('creation_date'),
             func.count(cls.id).label('count_orders'),
             func.sum(cls.amount).label('total_amount')) \
             .group_by(func.date(cls.created_at)) \
             .all()
+
+        if stats_1 is None and stats_2 is None:
+            raise NoResultFound
 
         return [stats_1, stats_2]
 
