@@ -73,7 +73,7 @@ function updateTable(orders) {
     let products = order.products.map((product, i) => `
     <tr>
       <th style='border: none'>N°${i + 1}</th>
-      <th style='border: none'><img src="../static/flowers/${product.image}" height="40px"></th>
+      <th style='border: none'><img src="../static/flowers/${product.filename}" height="40px"></th>
       <th style='border: none'>${product.name}</th>
       <th style='border: none'>$ ${product.price}</th>
     </tr>`).join('');
@@ -131,7 +131,7 @@ function updateTable(orders) {
     <th>${order.recipient_name}</th>
     <th>${order.recipient_address}</th>
     <th>${order.message}</th>
-    <th>${order.number_of_products}</th>
+    <th>${order.products_number}</th>
     <th>$ ${order.amount}</th>
     <th>${order.status}</th>
     ${actions}
