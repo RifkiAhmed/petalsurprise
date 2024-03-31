@@ -18,10 +18,12 @@ function addProducts(event) {
 
   if (name === '') {
     $("#flower-name").css('border', '2px solid red');
+    $('#flower-name').focus();
     return;
   }
   if (price === '') {
     $("#flower-price").css('border', '2px solid red');
+    $("#flower-price").focus();
     return;
   }
 
@@ -49,7 +51,7 @@ function addProducts(event) {
       $('.alert_message').text(error.responseJSON.error);
       $('.alert-danger').css('display', 'block');
       setTimeout(() => $('.alert-danger').css('display', 'none'), 3000);
-      console.log("Error:", error.responseJSON.error);
+      console.log("Error:", error.statusText);
     },
   });
 }
@@ -64,24 +66,32 @@ function deleteProduct(id) {
       window.location.href = "/";
     },
     error: (error) => {
-      console.log(error.message);
+      console.log("Error:", error.statusText);
     }
   });
 }
 
 // Fill inputs fields of the update product modal with the data of the product passed as argument
-function fillUpdateProductModal(product) {
-  $('#product-name-id').text(`${product.name} #${product.id}`);
-  $('#product-new-name').val(product.name);
-  $('#product-new-price').val(product.price);
-  $('#product-new-description').val(product.description);
-  $('#product-image').attr('src', `../static/flowers/${product.img_path}`).css({
-    'width': '305px',
-    'height': '305px',
-    'border-radius': '8px'
+function fillUpdateProductModal(product_id) {
+  $.ajax({
+    method: 'GET',
+    url: `/product/${product_id}`,
+    success: (response) => { 
+      product = response;
+      $('#product-name-id').text(`${product.name} #${product.id}`);
+      $('#product-new-name').val(product.name);
+      $('#product-new-price').val(product.price);
+      $('#product-new-description').val(product.description);
+      $('#product-image').attr('src', `../static/flowers/${product.filename}`).css({
+        'width': '305px',
+        'height': '305px',
+        'border-radius': '8px'
+      });
+      $('#submit-update-product').attr('onclick', `submitUpdateProduct(event, ${product.id})`)
+      $('#updateProduct').modal('show');
+    },
+    error: (error) => { console.log('Error:', error.statusText); }
   });
-  $('#submit-update-product').attr('onclick', `submitUpdateProduct(event, ${product.id})`)
-  $('#updateProduct').modal('show');
 }
 
 // Submit the changes for the product with the id passed as argument
@@ -95,10 +105,12 @@ function submitUpdateProduct(event, id) {
 
   if (name === '') {
     $("#product-new-name").css('border', '2px solid red');
+    $("#product-new-name").focus();
     return;
   }
   if (price === '') {
     $("#product-new-price").css('border', '2px solid red');
+    $("#product-new-price").focus();
     return;
   }
 
@@ -122,7 +134,7 @@ function submitUpdateProduct(event, id) {
       $('.update_alert_message').text(JSON.parse(error.responseText).error);
       $('.update-alert-danger').css('display', 'block');
       setTimeout(() => $('.update-alert-danger').css('display', 'none'), 3000);
-      console.log("Error:", JSON.parse(error.responseText).error);
+      console.log("Error:", error.statusText);
     },
   });
 }
