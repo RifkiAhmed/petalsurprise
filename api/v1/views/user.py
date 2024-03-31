@@ -10,84 +10,90 @@ from models import storage, AUTH
 
 @views.route("/users", methods=["POST"])
 def users() -> str:
-    """User registration
+    """ Add user to the database
     """
     email = request.form.get("email")
     password = request.form.get("password")
+
     try:
         AUTH.register_user(email, password)
-        return jsonify({"message": "user created"}), 200
     except ValueError:
         return jsonify({"message": "This email is already registered"}), 400
+
+    return jsonify({"message": "user created"}), 201
 
 
 @views.route("/sessions", methods=["POST"])
 def login() -> str:
-    """User login
+    """ Create a session authentication for the user logged in
     """
-    username = request.form.get("email")
+    login = request.form.get("email")
     password = request.form.get("password")
-    valid_lagin = AUTH.valid_login(password, email=username)
+    valid_lagin = AUTH.valid_login(password=password, email=login)
+
     session_id = None
     if not valid_lagin:
-        valid_lagin = AUTH.valid_login(password, username=username)
+        valid_lagin = AUTH.valid_login(password=password, username=login)
         if not valid_lagin:
             abort(401)
         else:
-            session_id = AUTH.create_session(username=username)
+            session_id = AUTH.create_session(username=login)
     else:
-        session_id = AUTH.create_session(email=username)
-    response = jsonify({"email": username, "message": "logged in"})
+        session_id = AUTH.create_session(email=login)
+
+    response = jsonify({})
     response.set_cookie("session_id", session_id)
     return response
 
 
 @views.route("/sessions", methods=["DELETE"])
 def logout() -> None:
-    """User logout
+    """ User logout by deleting the user's session
     """
     user = AUTH.get_user_from_session_id(request.cookies.get('session_id'))
     if not user:
-        abort(403)
+        abort(401)
+
     AUTH.destroy_session(user)
     response = jsonify({})
     response.set_cookie("session_id", "",
                         expires=datetime.now() + timedelta(days=-1))
-    return response
+    return response, 200
 
 
 @views.route("/profile", methods=["GET"])
 def profile() -> str:
-    """ User profile
+    """ Returns user's profile
     """
     user = AUTH.get_user_from_session_id(request.cookies.get('session_id'))
-    if not user:
-        abort(403)
     return render_template('/profile.html', user=user)
 
 
 @views.route("/profile", methods=["PUT"])
 def update_profile() -> str:
-    """ Update user profile
+    """ Updates user's profile
     """
-    user = AUTH.get_user_from_session_id(request.cookies.get('session_id'))
-    if not user:
-        abort(403)
     email = request.form.get("email")
     username = request.form.get("username")
     current_password = request.form.get("currentPassword")
     new_password = request.form.get("password")
+
     try:
-        if username:
-            storage.update(user, username=username)
-            return jsonify({"message": "Username updated"}), 200
+        user = AUTH.get_user_from_session_id(request.cookies.get('session_id'))
+
         if email:
             storage.update(user, email=email)
             return jsonify({"message": "Email updated"}), 200
+
+        if username:
+            storage.update(user, username=username)
+            return jsonify({"message": "Username updated"}), 200
+
         if new_password:
+            # returns True if valid login else False
             if not AUTH.valid_login(current_password, email=user.email):
                 abort(401)
             AUTH.update_password(user, new_password=new_password)
             return jsonify({"message": "Password updated"}), 200
-    except ValueError:
-        abort(403)
+    except ValueError as e:
+        return jsonify({"message": str(e)}), 400
