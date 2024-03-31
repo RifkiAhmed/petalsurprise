@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 """ Route module for the API
 """
-from flask import Flask, request, jsonify, abort, redirect, url_for
+from flask import Flask, request, abort, redirect, url_for, render_template
 from flask_cors import CORS
 from api.v1.views import views
 from models import storage, AUTH
@@ -17,28 +17,21 @@ async def before_request():
     """ Filter each request to ensure authentication
     """
     if AUTH.require_auth(request):
-        abort(403)
-
-
-@app.errorhandler(401)
-def unauthorized(_):
-    """ Unauthorized error handler
-    """
-    return jsonify({"error": "Unauthorized"}), 401
+        abort(401)
 
 
 @app.errorhandler(403)
-def forbidden(_) -> str:
-    """ Redirect user to the home page when Forbidden error
+def forbidden(_):
+    """ Redirect user to the home page for 403 Forbidden error
     """
     return redirect(url_for('views.index'))
 
 
 @app.errorhandler(404)
-def not_found(_) -> str:
-    """ Not found handler
+def not_found(_):
+    """ Returns a custom template for 404 Not found error
     """
-    return jsonify({"error": "Not found"}), 404
+    return render_template('404.html')
 
 
 @app.teardown_appcontext
