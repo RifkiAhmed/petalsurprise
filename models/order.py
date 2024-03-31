@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 """
-Product model
+Order model
 """
 from models.basemodel import BaseModel, Base
 from sqlalchemy import Column, String, Integer, ForeignKey, Table
@@ -15,7 +15,7 @@ order_product_association = Table(
 
 
 class Order(BaseModel, Base):
-    """ Product class
+    """ Order class
     """
     __tablename__ = "orders"
     user_id = Column(Integer, ForeignKey('users.id'), nullable=True)
