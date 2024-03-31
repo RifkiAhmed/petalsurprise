@@ -24,10 +24,11 @@ def create_checkout_session():
     recipient_name = data.get('recipient_name')
     recipient_address = data.get('recipient_address')
     message = data.get('message', '')
+
     list_items = []
-    ids = []
+    products_ids = []
     for item in cart:
-        ids.append(item['id'])
+        products_ids.append(item['id'])
         line_item = {
             'price_data': {
                 'currency': 'usd',
@@ -47,12 +48,13 @@ def create_checkout_session():
             'recipient_name': recipient_name,
             'recipient_address': recipient_address,
             'message': message,
-            'products': ', '.join(map(str, ids))}
+            'products': ', '.join(map(str, products_ids))}
         },
         mode='payment',
         success_url='https://petalsurprise.store',
         cancel_url='https://petalsurprise.store',
     )
+
     return jsonify({'sessionId': session.id})
 
 
@@ -94,10 +96,12 @@ def stripe_webhook():
                       payment_method_type=payment_method_type, amount=amount,
                       currency=currency, charge_id=charge_id)
         storage.add(order)
+
         for product_id in products_ids:
             product = storage.find_by(Product, id=int(product_id))
             order.products.append(product)
         storage.save()
+
     return 'Success', 200
 
 
@@ -106,15 +110,17 @@ def charge_refund():
     """ Refund customer
     """
     user = AUTH.get_user_from_session_id(request.cookies.get('session_id'))
-    if not user or not user.is_admin:
+    if not user.is_admin:
         abort(403)
+
     order_id = request.form.get('orderId')
     charge_id = request.form.get('chargeId')
     if order_id and charge_id:
         try:
-            refund = stripe.Refund.create(charge=charge_id,)
+            stripe.Refund.create(charge=charge_id,)
             order = storage.find_by(Order, id=order_id)
             storage.update(order, status="Refunded")
         except Exception as e:
-            return jsonify({"message": e.message})
-    return jsonify({})
+            return jsonify({"error": e.message}), 400
+
+    return jsonify({}), 200
