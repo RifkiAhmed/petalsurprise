@@ -13,59 +13,41 @@ FORMAT = "%Y-%m-%d %H:%M"
 
 
 def _orders_data(orders):
-    orders_data = []
-    if not orders:
-        return []
+    orders_list = []
     for order in orders:
-        order_data = {
-            'charge_id': order.charge_id,
-            'id': order.id,
-            'created_at': datetime.strftime(
-                order.created_at, FORMAT),
-            'user_email': order.user_email,
-            'recipient_name': order.recipient_name,
-            'recipient_address': order.recipient_address,
-            'products_number': len(order.products),
-            'message': order.message,
-            'payment_method_type': order.payment_method_type,
-            'status': order.status,
-            'amount': int(order.amount) / 100,
-            'number_of_products': len(order.products),
-            'products': []
-        }
+        order_dict = order.to_dict()
+        order_dict["created_at"] = order_dict["created_at"].strftime(FORMAT)
+        order_dict["amount"] /= 100
+        order_dict["products"] = []
         for product in order.products:
-            products_data = {
-                'name': product.name,
-                'image': product.img_path,
-                'price': product.price
-            }
-            order_data['products'].append(products_data)
-        orders_data.append(order_data)
-    return orders_data
+            order_dict["products"].append(product.to_dict())
+        order_dict["products_number"] = len(order.products)
+        orders_list.append(order_dict)
+    return orders_list
 
 
 @views.route("/user_orders", methods=["GET"])
 def user_activity() -> str:
-    """ User orders history
+    """ Returns user's orders
     """
     user = AUTH.get_user_from_session_id(request.cookies.get('session_id'))
-    if not user:
-        abort(401)
+
     try:
         orders = storage.find_all(Order, user_id=user.id)
-        _orders = _orders_data(orders)
-        return _orders, 200
-    except ValueError:
-        abort(403)
+        orders_list = _orders_data(orders)
+        return jsonify(orders_list), 200
+    except NoResultFound:
+        return jsonify({}), 200
 
 
 @views.route("/dashboard/overview", methods=["GET"])
-def dashboard_overview() -> str:
-    """ Admin dashboard
+def dashboard_overview():
+    """ Admin dashboard overview
     """
     user = AUTH.get_user_from_session_id(request.cookies.get('session_id'))
-    if not user or not user.is_admin:
+    if not user.is_admin:
         abort(403)
+
     try:
         stats_1, stats_2 = storage.orders_overview(Order)
         status = {
@@ -74,23 +56,62 @@ def dashboard_overview() -> str:
             "Delivered": None,
             "Cancelled": None,
             "Refunded": None}
+
         i = 0
         for stat in stats_1:
+            # stat[1]: Number of orders, stat[2]: Total amount
             status[stat[0]] = [stat[1], stat[2] // 100]
-        stats_2_dicts = []
+
+        stats_2_list = []
         for stat in stats_2:
             stat_dict = {
-                "date": str(
-                    stat[0]), "count": stat[1], "total_amount": int(
-                    stat[2]) // 100}
-            stats_2_dicts.append(stat_dict)
+                "date": str(stat[0]),  # creation date
+                "count": stat[1],  # orders count
+                "total_amount": int(stat[2]) // 100}  # Total amount
+            stats_2_list.append(stat_dict)
+
         return render_template(
             '/dashboard_overview.html',
             user=user,
             stats=status,
-            data=stats_2_dicts)
+            data=stats_2_list)
     except NoResultFound:
         return render_template('/dashboard_overview.html', user=user)
+
+
+@views.route("/orders", methods=["GET"])
+def orders() -> str:
+    """ Returns all orders with the specified status
+    """
+    user = AUTH.get_user_from_session_id(request.cookies.get('session_id'))
+    if not user.is_admin:
+        abort(403)
+
+    status = request.args.get('status')
+    from_date = request.args.get('from')
+    to_date = request.args.get('to')
+
+    orders = None
+    try:
+        if status == 'Default':
+            orders = storage.all(Order)
+        else:
+            orders = storage.find_all(Order, status=status)
+    except NoResultFound:
+        pass
+
+    if from_date:
+        from_date = datetime.fromisoformat(from_date)
+        orders_from = [o for o in orders if o.created_at >= from_date]
+        orders = orders_from
+
+    if to_date:
+        to_date = datetime.fromisoformat(to_date) + timedelta(days=1)
+        orders_to = [o for o in orders if o.created_at <= to_date]
+        orders = orders_to
+
+    orders_list = _orders_data(orders)
+    return jsonify(orders_list), 200
 
 
 @views.route("/dashboard/orders", methods=["GET"])
@@ -108,55 +129,29 @@ def dashboard_orders() -> str:
     return render_template('/dashboard_orders.html', user=user, orders=orders)
 
 
-@views.route("/orders", methods=["GET"])
-def orders() -> str:
-    """ Returns all orders with the specified status
-    """
-    user = AUTH.get_user_from_session_id(request.cookies.get('session_id'))
-    if not user or not user.is_admin:
-        abort(403)
-    orders = None
-    status = request.args.get('status')
-    from_date = request.args.get('from')
-    to_date = request.args.get('to')
-    try:
-        if status == 'Default':
-            orders = storage.all(Order)
-        else:
-            orders = storage.find_all(Order, status=status)
-    except NoResultFound:
-        pass
-    orders_data = orders
-    if from_date:
-        from_date = datetime.fromisoformat(from_date)
-        orders_from = [o for o in orders if o.created_at >= from_date]
-        orders_data = orders_from
-    if to_date:
-        to_date = datetime.fromisoformat(to_date) + timedelta(days=1)
-        orders_to = [o for o in orders_data if o.created_at <= to_date]
-        orders_data = orders_to
-    orders_data_dict = _orders_data(orders_data)
-    return orders_data_dict
-
-
 @views.route("/orders", methods=["PUT"])
-def update_order() -> str:
+def update_order() -> None:
     """ Update order status
     """
     from api.v1 import send_email
+
     user = AUTH.get_user_from_session_id(request.cookies.get('session_id'))
-    if not user or not user.is_admin:
+    if not user.is_admin:
         abort(403)
+
     id = request.form.get('id')
     status = request.form.get('status')
     order = storage.find_by(Order, id=id)
+
     if order:
         storage.update(order, status=status)
+
     if status == 'Delivered':
         send_email(
             subject="Order delivered",
-            message="",
+            message=None,
             sender=None,
             receiver=order.user_email,
             order=order)
-    return jsonify({})
+
+    return jsonify({}), 200
